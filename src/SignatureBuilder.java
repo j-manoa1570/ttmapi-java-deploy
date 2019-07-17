@@ -66,7 +66,7 @@ public class SignatureBuilder {
         }
         this.signature = sigBuilder();
         this.encryptedSignature = encrypter();
-        this.authorization = this.token + ":" + this.encryptedSignature;
+        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
     }
 
     public String getKeyword() { return keyword; }
@@ -90,7 +90,7 @@ public class SignatureBuilder {
     public void setProgramID(String programID) { this.programID = programID; }
     public void setSignature() { this.signature = sigBuilder(); }
     public void setEncryptedSignature() { this.encryptedSignature = encrypter(); }
-    public void setAuthorization() { this.authorization = token + ":" + encryptedSignature; }
+    public void setAuthorization() { this.authorization = "SignalVine " + token + ":" + encryptedSignature; }
     public void setStatus(int status) { this.status = status; }
 
     /*
@@ -206,13 +206,54 @@ public class SignatureBuilder {
         return testStr;
     }
 
+    public void makeGetRequest() {
+
+        String url = "https://theseus-api.signalvine.com" + urlEndPoint;
+
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            try {
+            // optional default is GET
+                //con.setRequestMethod(keyword);
+                con.setConnectTimeout(50000);
+                con.setReadTimeout(50000);
+//                con.setDoOutput(true);
+                con.setRequestProperty("Authorization", authorization);
+                con.setRequestProperty("SignalVine-Date", timeStamp);
+
+                status = con.getResponseCode();
+                System.out.println("\nSending 'GET' request to URL : " + url);
+                System.out.println("Response Code : " + status);
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) response.append(inputLine);
+                in.close();
+                System.out.println(response);
+                responseBody = response.toString();
+            }
+            finally {
+                con.disconnect();
+            }
+        } catch (MalformedURLException malformed) {
+            System.out.println(malformed);
+        } catch (IOException io) {
+            System.out.println(io);
+        }
+    }
+
     /*
      *  MAKE REQUEST
      *  INPUT: urlEndPoint, keyword, authorization, timeStamp
      *  DESCRIPTION: Creates a new request to be sent to SV API.
      *  OUTPUT:
      */
-    public void makeRequest()  {
+    public void makePostRequest()  {
         String url = "https://theseus-api.signalvine.com" + urlEndPoint;
 
         try {

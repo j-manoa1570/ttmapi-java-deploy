@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="ttmapi-deploy:war">
+    <output-path>$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war</output-path>
+    <root id="archive" name="ttmapi-deploy_war.war">
+      <element id="artifact" artifact-name="ttmapi-deploy:war exploded" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="library" level="application" name="json-20180813" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

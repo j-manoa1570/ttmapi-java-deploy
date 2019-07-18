@@ -11,54 +11,53 @@ import java.io.PrintWriter;
 
 /*
  *  LIST PROGRAMS
- *  This servlet will build the request to list all programs that an account is connected with.
+ *  This servlet will build the request to list all programs that an participant is connected with.
  *  Documentation shows that the request will be:
- *  GET https://theseus-api.signalvine.com/v1/accounts/<account id>/programs
+ *  GET https://theseus-api.signalvine.com/v1/participants/<participant id>/programs
  *
  */
 
 
-
-@WebServlet("/programParticipants")
-public class ProgramParticipants extends HttpServlet {
+@WebServlet("/participantMessages")
+public class ParticipantMessages extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String account) {
+    private JSONObject decrypt(String token, String secret, String participant) {
         JSONObject data = new JSONObject();
         data.put("keyword", "GET");
         data.put("token", token);
         data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/accounts/" + account + "/participants");
+        data.put("urlEndPoint", "/v1/participants/" + participant + "/messages");
         return data;
     }
 
-    public ProgramParticipants() {
+    public ParticipantMessages() {
         super();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
-        String accountID = request.getParameter("accountID");
+        String participantID = request.getParameter("participantID");
 
         JSONObject decryptedData;
         // TODO: Build decrypter() that returns a JSONObject
-        decryptedData = decrypt(token, secret, accountID);
+        decryptedData = decrypt(token, secret, participantID);
 
 
-        SignatureBuilder programParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
+        SignatureBuilder participantMessages = new SignatureBuilder(decryptedData.getString("keyword"),
                 decryptedData.getString("token"), decryptedData.getString("secret"),
                 decryptedData.getString("urlEndPoint"));
 
         try {
-            programParticipants.makeGetRequest();
+            participantMessages.makeGetRequest();
         } finally {
-            if (programParticipants.getStatus() == 200 || programParticipants.getStatus() == 202) {
+            if (participantMessages.getStatus() == 200 || participantMessages.getStatus() == 202) {
                 PrintWriter out = response.getWriter();
-                out.print(programParticipants.successfulRequest());
+                out.print(participantMessages.successfulRequest());
             } else {
                 PrintWriter out = response.getWriter();
-                out.print(programParticipants.unsuccessfulRequest());
+                out.print(participantMessages.unsuccessfulRequest());
             }
         }
     }

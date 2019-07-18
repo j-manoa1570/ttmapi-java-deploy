@@ -18,21 +18,20 @@ import java.io.PrintWriter;
  */
 
 
-
-@WebServlet("/programParticipants")
-public class ProgramParticipants extends HttpServlet {
+@WebServlet("/listParticipants")
+public class ListParticipants extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String account) {
+    private JSONObject decrypt(String token, String secret, String program) {
         JSONObject data = new JSONObject();
         data.put("keyword", "GET");
         data.put("token", token);
         data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/accounts/" + account + "/participants");
+        data.put("urlEndPoint", "/v1/programs/" + program + "/participants");
         return data;
     }
 
-    public ProgramParticipants() {
+    public ListParticipants() {
         super();
     }
 
@@ -46,19 +45,19 @@ public class ProgramParticipants extends HttpServlet {
         decryptedData = decrypt(token, secret, accountID);
 
 
-        SignatureBuilder programParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
+        SignatureBuilder listParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
                 decryptedData.getString("token"), decryptedData.getString("secret"),
                 decryptedData.getString("urlEndPoint"));
 
         try {
-            programParticipants.makeGetRequest();
+            listParticipants.makeGetRequest();
         } finally {
-            if (programParticipants.getStatus() == 200 || programParticipants.getStatus() == 202) {
+            if (listParticipants.getStatus() == 200 || listParticipants.getStatus() == 202) {
                 PrintWriter out = response.getWriter();
-                out.print(programParticipants.successfulRequest());
+                out.print(listParticipants.successfulRequest());
             } else {
                 PrintWriter out = response.getWriter();
-                out.print(programParticipants.unsuccessfulRequest());
+                out.print(listParticipants.unsuccessfulRequest());
             }
         }
     }

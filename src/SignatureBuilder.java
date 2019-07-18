@@ -206,6 +206,12 @@ public class SignatureBuilder {
         return testStr;
     }
 
+    /*
+     *  MAKE GET REQUEST
+     *  INPUT:
+     *  DESCRIPTION:
+     *  OUTPUT:
+     */
     public void makeGetRequest() {
 
         String url = "https://theseus-api.signalvine.com" + urlEndPoint;
@@ -319,4 +325,20 @@ public class SignatureBuilder {
             System.out.println(io);
         }
     }
+
+    public String successfulRequest() {
+        return "<html><body><h1 align='center'>Your request was successful!</h1></body></html>";
+    }
+
+    public String unsuccessfulRequest() {
+        return "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
+                + getStatus() + ".</h1><h2>Token Used: " + getToken() + "</h2><h2>Secret Used: "
+                + getSecret() + "</h2><h2>Keyword Used: " + getKeyword() + "</h2><h2>Endpoint Used: "
+                + getUrlEndPoint() + "</h2><h2>Timestamp Used: " + getTimeStamp() + "</h2><h2>Signature Used: "
+                + getSignature() + "</h2><h2>Encrypted Signature Used: " + getEncryptedSignature() +
+                "</h2><h2>Authorization Used: " + getAuthorization() + "</h2><h2>Response received: "
+                + getResponseBody() + "</h2></body></html>";
+    }
+
+
 }

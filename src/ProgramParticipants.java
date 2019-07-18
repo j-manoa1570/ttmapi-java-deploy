@@ -28,7 +28,7 @@ public class ProgramParticipants extends HttpServlet {
         data.put("keyword", "GET");
         data.put("token", token);
         data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/accounts/" + account + "/participants");
+        data.put("urlEndPoint", "/v1/programs/" + account + "/participants");
         return data;
     }
 
@@ -39,7 +39,7 @@ public class ProgramParticipants extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
-        String accountID = request.getParameter("accountID");
+        String accountID = request.getParameter("programID");
 
         JSONObject decryptedData;
         // TODO: Build decrypter() that returns a JSONObject

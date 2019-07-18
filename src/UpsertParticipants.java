@@ -18,47 +18,46 @@ import java.io.PrintWriter;
  */
 
 
-
-@WebServlet("/listPrograms")
-public class ListPrograms extends HttpServlet {
+@WebServlet("/upsertParticipants")
+public class UpsertParticipants extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String account) {
+    private JSONObject decrypt(String token, String secret, String program) {
         JSONObject data = new JSONObject();
-        data.put("keyword", "GET");
+        data.put("keyword", "POST");
         data.put("token", token);
         data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/accounts/" + account + "/programs");
+        data.put("urlEndPoint", "/v2/programs/" + program + "/participants");
         return data;
     }
 
-    public ListPrograms() {
+    public UpsertParticipants() {
         super();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
-        String account = request.getParameter("accountID");
+        String program = request.getParameter("programID");
 
         JSONObject decryptedData;
         // TODO: Build full decrypter() that returns a JSONObject
-        decryptedData = decrypt(token, secret, account);
+        decryptedData = decrypt(token, secret, program);
 
 
-        SignatureBuilder listPrograms = new SignatureBuilder(decryptedData.getString("keyword"),
+        SignatureBuilder upsertParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
                 decryptedData.getString("token"), decryptedData.getString("secret"),
-                decryptedData.getString("urlEndPoint"));
+                decryptedData.getString("urlEndPoint"), decryptedData.getString("body"), decryptedData.getString("programID"));
 
         try {
-            listPrograms.makeGetRequest();
+            upsertParticipants.makeGetRequest();
         } finally {
-            if (listPrograms.getStatus() == 200 || listPrograms.getStatus() == 202) {
+            if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
                 PrintWriter out = response.getWriter();
-                out.print(listPrograms.successfulRequest());
+                out.print(upsertParticipants.successfulRequest());
             } else {
                 PrintWriter out = response.getWriter();
-                out.print(listPrograms.unsuccessfulRequest());
+                out.print(upsertParticipants.unsuccessfulRequest());
             }
         }
     }

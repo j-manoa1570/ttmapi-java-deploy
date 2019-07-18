@@ -21,8 +21,8 @@ public class SignatureBuilder {
     private String body;
     private String timeStamp;
     private String programID;
-    private String participantID;
-    private String accountID;
+//    private String participantID;
+//    private String accountID;
     private String requestType;
     private String everything;
     private String signature;
@@ -34,10 +34,6 @@ public class SignatureBuilder {
     private String[] badbody = new String[] {"[","]",", "," ","/_"};
     private String[] goodbody = new String[] {"","","\n",",", " "};
 
-    SignatureBuilder() {
-
-    }
-
     /*
      *  Constructor for building a GET signature
      */
@@ -48,7 +44,8 @@ public class SignatureBuilder {
     /*
      *  Constructor for building a POST signature
      */
-    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body) {
+    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID) {
+        this.programID = programID;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
 
@@ -59,7 +56,7 @@ public class SignatureBuilder {
         this.urlEndPoint = urlEndPoint;
         setTimeStamp();
         if (keyword.equals("POST")) {
-            this.body = strStripper(body, badbody, goodbody);
+            this.body = strStripper(body);
             this.body = JSONBuilder();
         } else {
             this.body = "";
@@ -168,9 +165,9 @@ public class SignatureBuilder {
      *  same length.
      *  OUTPUT: A cleaned up string.
      * */
-    private String strStripper (String toStrip, String[] badSubStr, String[] goodSubStr) {
+    private String strStripper (String toStrip) {
 
-        for (int i = 0; i < badSubStr.length; i++) toStrip = toStrip.replace(badSubStr[i], goodSubStr[i]);
+        for (int i = 0; i < badbody.length; i++) toStrip = toStrip.replace(badbody[i], goodbody[i]);
 
         return toStrip;
     }
@@ -326,18 +323,38 @@ public class SignatureBuilder {
         }
     }
 
+    /*
+     *  SUCCESSFUL REQUEST
+     *  INPUT: None
+     *  DESCRIPTION: Returns success string
+     *  OUTPUT: Success string
+     */
     public String successfulRequest() {
         return "<html><body><h1 align='center'>Your request was successful!</h1></body></html>";
     }
 
+    /*
+     *  UNSUCCESSFUL REQUEST
+     *  INPUT: None
+     *  DESCRIPTION: Outputs a string for an unsuccessful request
+     *  OUTPUT: String
+     */
     public String unsuccessfulRequest() {
-        return "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
+        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
                 + getStatus() + ".</h1><h2>Token Used: " + getToken() + "</h2><h2>Secret Used: "
                 + getSecret() + "</h2><h2>Keyword Used: " + getKeyword() + "</h2><h2>Endpoint Used: "
-                + getUrlEndPoint() + "</h2><h2>Timestamp Used: " + getTimeStamp() + "</h2><h2>Signature Used: "
+                + getUrlEndPoint();
+
+        if (keyword.equals("POST")) {
+            fail = fail + "</h2><h2>Body Used: " + getBody();
+        }
+
+        fail = fail + "</h2><h2>Timestamp Used: " + getTimeStamp() + "</h2><h2>Signature Used: "
                 + getSignature() + "</h2><h2>Encrypted Signature Used: " + getEncryptedSignature() +
                 "</h2><h2>Authorization Used: " + getAuthorization() + "</h2><h2>Response received: "
                 + getResponseBody() + "</h2></body></html>";
+
+        return fail;
     }
 
 

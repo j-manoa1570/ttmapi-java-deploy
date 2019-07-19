@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
+import java.util.*;
 
 public class SignatureBuilder {
 
@@ -21,8 +21,6 @@ public class SignatureBuilder {
     private String body;
     private String timeStamp;
     private String programID;
-//    private String participantID;
-//    private String accountID;
     private String requestType;
     private String everything;
     private String signature;
@@ -31,8 +29,11 @@ public class SignatureBuilder {
     private int status = 9000;
     private String responseBody;
     // Arrays that are used when formatting strings
-    private String[] badbody = new String[] {"[","]",", "," ","/_"};
-    private String[] goodbody = new String[] {"","","\n",",", " "};
+//    private String[] badbody = new String[] {"[","]",", "," ","/_"};
+//    private String[] goodbody = new String[] {"","","\n",",", " "};
+
+    private String[] badbody = new String[] {", ","][","[","]"};
+    private String[] goodbody = new String[] {",","\n","",""};
 
     /*
      *  Constructor for building a GET signature
@@ -56,7 +57,9 @@ public class SignatureBuilder {
         this.urlEndPoint = urlEndPoint;
         setTimeStamp();
         if (keyword.equals("POST")) {
-            this.body = strStripper(body);
+            this.body = bodyFormatter(body);
+            this.everything = this.body;
+            this.body = strStripper(this.body);
             this.body = JSONBuilder();
         } else {
             this.body = "";
@@ -78,6 +81,7 @@ public class SignatureBuilder {
     public String getAuthorization() { return authorization; }
     public String getResponseBody() {return responseBody; }
     public int getStatus() { return status; }
+    public String getEverything() { return everything; }
 
     public void setKeyword(String keyword) { this.keyword = keyword; }
     public void setToken(String token) { this.token = token; }
@@ -201,6 +205,31 @@ public class SignatureBuilder {
         System.out.println("STEP 3 JSON as a string:" + testStr);
 
         return testStr;
+    }
+
+    /*
+     *  BODY FORMATTER
+     *  INPUT: JSON formatted string
+     *  DESCRIPTION: Takes a JSON string, splits up the field types and field values into separate lists, and
+     *               returns a string version of the two lists.
+     *  OUTPUT: String
+     */
+    private String bodyFormatter(String bodyParam) {
+        String body = "{" + bodyParam + "}";
+
+        JSONObject bodyData = new JSONObject(body);
+        Iterator keys = bodyData.keys();
+        List<String> fieldTypes = new LinkedList<String>();
+        List<String> fieldValues = new LinkedList<String>();
+
+        while (keys.hasNext()) {
+            String dynamicKey = (String) keys.next();
+            if (!dynamicKey.equals("_id") && !dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
+                fieldTypes.add(dynamicKey);
+                fieldValues.add(bodyData.getString(dynamicKey));
+            }
+        }
+        return new String(fieldTypes.toString() + fieldValues.toString());
     }
 
     /*
@@ -346,7 +375,7 @@ public class SignatureBuilder {
                 + getUrlEndPoint();
 
         if (keyword.equals("POST")) {
-            fail = fail + "</h2><h2>Body Used: " + getBody();
+            fail = fail + "</h2><h2>Body Used: " + getBody() + "</h2><h2>Participant Data Used: " + getEverything();
         }
 
         fail = fail + "</h2><h2>Timestamp Used: " + getTimeStamp() + "</h2><h2>Signature Used: "

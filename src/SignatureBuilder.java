@@ -28,6 +28,7 @@ public class SignatureBuilder {
     private String authorization;
     private int status = 9000;
     private String responseBody;
+    private String data;
     // Arrays that are used when formatting strings
 //    private String[] badbody = new String[] {"[","]",", "," ","/_"};
 //    private String[] goodbody = new String[] {"","","\n",",", " "};
@@ -45,8 +46,9 @@ public class SignatureBuilder {
     /*
      *  Constructor for building a POST signature
      */
-    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID) {
+    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID, String data) {
         this.programID = programID;
+        this.data = data;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
 
@@ -82,6 +84,7 @@ public class SignatureBuilder {
     public String getResponseBody() {return responseBody; }
     public int getStatus() { return status; }
     public String getEverything() { return everything; }
+    public String getData() { return data; }
 
     public void setKeyword(String keyword) { this.keyword = keyword; }
     public void setToken(String token) { this.token = token; }
@@ -375,7 +378,7 @@ public class SignatureBuilder {
                 + getUrlEndPoint();
 
         if (keyword.equals("POST")) {
-            fail = fail + "</h2><h2>Body Used: " + getBody() + "</h2><h2>Participant Data Used: " + getEverything();
+            fail = fail + "</h2><h2>Body Param Used: " + getData() + "</h2><h2>Body Used: " + getBody() + "</h2><h2>Participant Data Used: " + getEverything();
         }
 
         fail = fail + "</h2><h2>Timestamp Used: " + getTimeStamp() + "</h2><h2>Signature Used: "

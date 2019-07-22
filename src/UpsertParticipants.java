@@ -1,8 +1,8 @@
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BASE64DecoderStream;
 import org.json.JSONObject;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -39,38 +41,75 @@ public class UpsertParticipants extends HttpServlet {
     private byte[] participantDataAsBytes = null;
     private byte[] encryptionKeyBytes = null;
 
-    private void setKey(String myKey)
-    {
-        MessageDigest sha = null;
-        try {
-            key = myKey.getBytes("UTF-8");
-            sha = MessageDigest.getInstance("SHA-1");
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, 16);
-            secretKey = new SecretKeySpec(key, "AES");
-        }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+    public UpsertParticipants() {
+        super();
     }
 
+    public byte[][] GenerateKeyAndIV(int keyLength, int ivLength, int iterations, byte[] salt, byte[] password, MessageDigest md) {
+
+        int digestLength = md.getDigestLength();
+        int requiredLength = (keyLength + ivLength + digestLength - 1) / digestLength * digestLength;
+        byte[] generatedData = new byte[requiredLength];
+        int generatedLength = 0;
+
+        try {
+            md.reset();
+
+            // Repeat process until sufficient data has been generated
+            while (generatedLength < keyLength + ivLength) {
+
+                // Digest data (last digest if available, password data, salt if available)
+                if (generatedLength > 0)
+                    md.update(generatedData, generatedLength - digestLength, digestLength);
+                md.update(password);
+                if (salt != null)
+                    md.update(salt, 0, 8);
+                md.digest(generatedData, generatedLength, digestLength);
+
+                // additional rounds
+                for (int i = 1; i < iterations; i++) {
+                    md.update(generatedData, generatedLength, digestLength);
+                    md.digest(generatedData, generatedLength, digestLength);
+                }
+
+                generatedLength += digestLength;
+            }
+
+            // Copy key and IV into separate byte arrays
+            byte[][] result = new byte[2][];
+            result[0] = Arrays.copyOfRange(generatedData, 0, keyLength);
+            if (ivLength > 0)
+                result[1] = Arrays.copyOfRange(generatedData, keyLength, keyLength + ivLength);
+
+            return result;
+
+        } catch (DigestException e) {
+            throw new RuntimeException(e);
+
+        } finally {
+            // Clean out temporary data
+            Arrays.fill(generatedData, (byte)0);
+        }
+    }
 
 
     private JSONObject decrypt(String token, String secret, String program, String participantData) {
 
         try
         {
-            participantDataAsBytes = participantData.getBytes();
-            String encryptionKeyString = "98962DF4D1CCEEE8";
-            encryptionKeyBytes = encryptionKeyString.getBytes();
-            Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-            secretKey = new SecretKeySpec(encryptionKeyBytes, "DES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            decryptedMessageBytes = cipher.doFinal(participantDataAsBytes);
-            decrypted = new String(decryptedMessageBytes);
+            byte[] cipherData = Base64.getDecoder().decode(participantData);
+            byte[] saltData = Arrays.copyOfRange(cipherData, 8, 16);
+
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            final byte[][] keyAndIV = GenerateKeyAndIV(32, 16, 1, saltData, secret.getBytes(StandardCharsets.UTF_8), md5);
+            SecretKeySpec key = new SecretKeySpec(keyAndIV[0], "AES");
+            IvParameterSpec iv = new IvParameterSpec(keyAndIV[1]);
+
+            byte[] encrypted = Arrays.copyOfRange(cipherData, 16, cipherData.length);
+            Cipher aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            aesCBC.init(Cipher.DECRYPT_MODE, key, iv);
+            byte[] decryptedData = aesCBC.doFinal(encrypted);
+            decrypted = new String(decryptedData, StandardCharsets.UTF_8);
         }
         catch (Exception e)
         {
@@ -92,16 +131,12 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
-    public UpsertParticipants() {
-        super();
-    }
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
         String program = request.getParameter("programID");
         String participantData = request.getParameter("body");
-
+        participantData = participantData.replace(" ", "+");
         JSONObject decryptedData;
 
         // TODO: Build full decrypter() that returns a JSONObject
@@ -126,7 +161,8 @@ public class UpsertParticipants extends HttpServlet {
                         decryptedData.getString("secret"),
                         decryptedData.getString("urlEndPoint"),
                         decryptedData.getString("body"),
-                        decryptedData.getString("programID"));
+                        decryptedData.getString("programID"),
+                        participantData);
 
 
                 try {

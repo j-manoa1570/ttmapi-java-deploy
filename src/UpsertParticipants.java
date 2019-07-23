@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.crypto.Cipher;
@@ -11,15 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
-//import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /*
@@ -29,8 +27,6 @@ import java.util.Base64;
  *  GET https://theseus-api.signalvine.com/v1/accounts/<account id>/programs
  *
  */
-
-
 @WebServlet("/upsertParticipants")
 public class UpsertParticipants extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -97,11 +93,13 @@ public class UpsertParticipants extends HttpServlet {
 
         try
         {
+            String passphrase = "EaL9KpCG4KQ3zxda";
+
             byte[] cipherData = Base64.getDecoder().decode(participantData);
             byte[] saltData = Arrays.copyOfRange(cipherData, 8, 16);
 
             MessageDigest md5 = MessageDigest.getInstance("MD5");
-            final byte[][] keyAndIV = GenerateKeyAndIV(32, 16, 1, saltData, secret.getBytes(StandardCharsets.UTF_8), md5);
+            final byte[][] keyAndIV = GenerateKeyAndIV(32, 16, 1, saltData, passphrase.getBytes(StandardCharsets.UTF_8), md5);
             SecretKeySpec key = new SecretKeySpec(keyAndIV[0], "AES");
             IvParameterSpec iv = new IvParameterSpec(keyAndIV[1]);
 
@@ -110,20 +108,26 @@ public class UpsertParticipants extends HttpServlet {
             aesCBC.init(Cipher.DECRYPT_MODE, key, iv);
             byte[] decryptedData = aesCBC.doFinal(encrypted);
             decrypted = new String(decryptedData, StandardCharsets.UTF_8);
+//            decrypted = decrypted.replace("[","");
+//            decrypted = decrypted.replace("]", "");
+            System.out.println("Decrypted Text: " + decrypted);
         }
         catch (Exception e)
         {
             System.out.println("Error while decrypting: " + e.toString());
         }
 
-        if (decrypted != null) {
+        if (decrypted.length() > 0) {
 
+//            JSONArray decryptedData = new JSONArray(decrypted);
+//            System.out.println("JSONArray: " + decryptedData);
             JSONObject data = new JSONObject();
             data.put("keyword", "POST");
             data.put("token", token);
             data.put("secret", secret);
             data.put("urlEndPoint", "/v2/programs/" + program + "/participants");
             data.put("programID", program);
+//            data.put("body", decryptedData);
             data.put("body", decrypted);
             return data;
         } else {
@@ -135,6 +139,7 @@ public class UpsertParticipants extends HttpServlet {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
         String program = request.getParameter("programID");
+//        String participantData = text;
         String participantData = request.getParameter("body");
         participantData = participantData.replace(" ", "+");
         JSONObject decryptedData;
@@ -156,11 +161,13 @@ public class UpsertParticipants extends HttpServlet {
             if (decryptedData.has("body")) {
 
 
-                SignatureBuilder upsertParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
+                SignatureBuilder upsertParticipants = new SignatureBuilder(
+                        decryptedData.getString("keyword"),
                         decryptedData.getString("token"),
                         decryptedData.getString("secret"),
                         decryptedData.getString("urlEndPoint"),
                         decryptedData.getString("body"),
+//                        decryptedData.getJSONArray("body"),
                         decryptedData.getString("programID"),
                         participantData);
 
@@ -169,8 +176,21 @@ public class UpsertParticipants extends HttpServlet {
                     upsertParticipants.makePostRequest();
                 } finally {
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
+                        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
+                                + upsertParticipants.getStatus() + ".</h1><h2>Token Used: " + upsertParticipants.getToken() + "</h2><h2>Secret Used: "
+                                + upsertParticipants.getSecret() + "</h2><h2>Keyword Used: " + upsertParticipants.getKeyword() + "</h2><h2>Endpoint Used: "
+                                + upsertParticipants.getUrlEndPoint();
+
+                        if (upsertParticipants.getKeyword().equals("POST")) {
+                            fail = fail + "</h2><h2>Body Param Used: " + upsertParticipants.getData() + "</h2><h2>Body Used: " + upsertParticipants.getBody() + "</h2><h2>Participant Data Used: " + upsertParticipants.getEverything();
+                        }
+
+                        fail = fail + "</h2><h2>Timestamp Used: " + upsertParticipants.getTimeStamp() + "</h2><h2>Signature Used: "
+                                + upsertParticipants.getSignature() + "</h2><h2>Encrypted Signature Used: " + upsertParticipants.getEncryptedSignature() +
+                                "</h2><h2>Authorization Used: " + upsertParticipants.getAuthorization() + "</h2><h2>Response received: "
+                                + upsertParticipants.getResponseBody() + "</h2><h3>Decrypted Value: " + decrypted + "</h3></body></html>";
                         PrintWriter out = response.getWriter();
-                        out.print(upsertParticipants.unsuccessfulRequest());
+                        out.print(fail);
                     } else {
                         PrintWriter out = response.getWriter();
                         out.print(upsertParticipants.unsuccessfulRequest());

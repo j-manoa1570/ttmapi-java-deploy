@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,6 +20,7 @@ public class SignatureBuilder {
     private String secret;
     private String urlEndPoint;
     private String body;
+    private JSONArray bodyJSONArray;
     private String timeStamp;
     private String programID;
     private String requestType;
@@ -47,19 +49,28 @@ public class SignatureBuilder {
      *  Constructor for building a POST signature
      */
     SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID, String data) {
+        System.out.println("Creating object...");
         this.programID = programID;
         this.data = data;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
 
-    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body) {
+    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, JSONArray body, String programID, String data) {
+        this.programID = programID;
+        this.data = data;
+        initializeEverything(keyword, token, secret, urlEndPoint, body);
+    }
+
+    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, JSONArray body) {
+        System.out.println("Initializing Variables...");
         this.keyword = keyword;
         this.token = token;
         this.secret = secret;
         this.urlEndPoint = urlEndPoint;
+        this.body = body.toString();
         setTimeStamp();
         if (keyword.equals("POST")) {
-            this.body = bodyFormatter(body);
+            this.body = bodyFormatter(this.body);
             this.everything = this.body;
             this.body = strStripper(this.body);
             this.body = JSONBuilder();
@@ -69,6 +80,30 @@ public class SignatureBuilder {
         this.signature = sigBuilder();
         this.encryptedSignature = encrypter();
         this.authorization = "SignalVine " + token + ":" + encryptedSignature;
+        System.out.println("Variables Initialized!");
+    }
+
+    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body) {
+        System.out.println("Initializing Variables...");
+        this.keyword = keyword;
+        this.token = token;
+        this.secret = secret;
+        this.urlEndPoint = urlEndPoint;
+        setTimeStamp();
+        if (keyword.equals("POST")) {
+            System.out.println("Initializing Keyword Accepted...");
+            this.body = bodyFormatter(body);
+            System.out.println("Assigning Body To Everything...");
+            this.everything = this.body;
+            this.body = strStripper(this.body);
+            this.body = JSONBuilder();
+        } else {
+            this.body = "";
+        }
+        this.signature = sigBuilder();
+        this.encryptedSignature = encrypter();
+        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
+        System.out.println("Variables Initialized!");
     }
 
     public String getKeyword() { return keyword; }
@@ -173,7 +208,7 @@ public class SignatureBuilder {
      *  OUTPUT: A cleaned up string.
      * */
     private String strStripper (String toStrip) {
-
+        System.out.println("Stripping String...");
         for (int i = 0; i < badbody.length; i++) toStrip = toStrip.replace(badbody[i], goodbody[i]);
 
         return toStrip;
@@ -188,21 +223,29 @@ public class SignatureBuilder {
      *  OUTPUT: A string that is formatted and can be sent to SV with no problems.
      */
     private String JSONBuilder() {
+        System.out.println("Building JSON...");
+
+        // Builds existing field for body
         String heading = body.substring(0,body.indexOf("\n"));
         heading = heading.replace(",", "\",\"");
+        heading = heading.replace("\"phone\",","");
+        heading = heading.replace("\"phone\"","");
         heading = "[\"" + heading + "\"]";
 
+        // Options fields
         JSONObject options = new JSONObject();
-        options.put("new", "ignore");
+        options.put("new", "add");
         options.put("mode", "row");
         options.put("absent", "ignore");
 
+        // Full JSON object
         JSONObject apiObject = new JSONObject();
         apiObject.put("program", programID);
         apiObject.put("options", options);
         apiObject.put("participants", body);
         System.out.println("STEP 2 JSONObject: " + apiObject);
 
+        // Convert to string and append the existing fields
         String testStr = apiObject.toString();
         testStr = testStr.replace("\"absent\":\"ignore\"", "\"absent\":\"ignore\",\"existing\":" + heading);
         System.out.println("STEP 3 JSON as a string:" + testStr);
@@ -218,13 +261,21 @@ public class SignatureBuilder {
      *  OUTPUT: String
      */
     private String bodyFormatter(String bodyParam) {
-        String body = "{" + bodyParam + "}";
+        System.out.println("Formatting Body...");
+
+        String body = bodyParam;
+        body = body.replace("[{", "{");
+        body = body.replace("}]", "}");
+
+        System.out.println(bodyParam);
 
         JSONObject bodyData = new JSONObject(body);
+        System.out.println("Created JSONObject...");
         Iterator keys = bodyData.keys();
         List<String> fieldTypes = new LinkedList<String>();
         List<String> fieldValues = new LinkedList<String>();
 
+        System.out.println("Created new JSONObject, Iterator, and List<String>");
         while (keys.hasNext()) {
             String dynamicKey = (String) keys.next();
             if (!dynamicKey.equals("_id") && !dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {

@@ -1,8 +1,5 @@
-import org.json.JSONArray;
 import org.json.JSONObject;
-
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
@@ -21,26 +18,37 @@ import java.util.Base64;
 
 
 /*
- *  LIST PROGRAMS
- *  This servlet will build the request to list all programs that an account is connected with.
+ *  UPSERT PARTICIPANTS
+ *  This servlet will build the request to insert and update users into SV. Functionality is currently only insert users
+ *  as update on their end does not appear to work.
  *  Documentation shows that the request will be:
- *  GET https://theseus-api.signalvine.com/v1/accounts/<account id>/programs
+ *  GET https://theseus-api.signalvine.com/v2/programs/<program id>/participants
  *
  */
 @WebServlet("/upsertParticipants")
 public class UpsertParticipants extends HttpServlet {
+
+    // Local variables to maintain everything. This will probably be stripped down more in a final version as I don't
+    // the three byte arrays are needed.
     private static final long serialVersionUID = 1L;
-    private SecretKey secretKey;
-    private static byte[] key;
     private String decrypted = "";
     private byte[] decryptedMessageBytes = null;
     private byte[] participantDataAsBytes = null;
     private byte[] encryptionKeyBytes = null;
 
+
+    /*
+     *  BASIC CONSTRUCTOR
+     *  Creates a new upsert item inheriting all of the methods and variables from HttpServlet Class
+     */
     public UpsertParticipants() {
         super();
     }
 
+    /*
+     *  GENERATE KEY AND IV
+     *  DESCRIPTION: Black magic
+     */
     public byte[][] GenerateKeyAndIV(int keyLength, int ivLength, int iterations, byte[] salt, byte[] password, MessageDigest md) {
 
         int digestLength = md.getDigestLength();
@@ -88,46 +96,55 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
-
+    /*
+     *  DECRYPT
+     *  INPUT: Token, secret, program, participantData
+     *  DESCRIPTION: Decrypt participantData and created a JSON object with all data.
+     *  OUTPUT: JSON object
+     */
     private JSONObject decrypt(String token, String secret, String program, String participantData) {
 
+        // TODO: Since Encryption and Decryption uses the same key, turn this into true async encrypt
+
+        // This is essentially black magic as I don't really know how it does what it does. All I know is that it does
+        // and for now that is enough.
         try
         {
+            // Passphrase that will be used to decrypt.
             String passphrase = "EaL9KpCG4KQ3zxda";
 
+            // Get byte data from cipher text
             byte[] cipherData = Base64.getDecoder().decode(participantData);
             byte[] saltData = Arrays.copyOfRange(cipherData, 8, 16);
 
+            // Black magic
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             final byte[][] keyAndIV = GenerateKeyAndIV(32, 16, 1, saltData, passphrase.getBytes(StandardCharsets.UTF_8), md5);
             SecretKeySpec key = new SecretKeySpec(keyAndIV[0], "AES");
             IvParameterSpec iv = new IvParameterSpec(keyAndIV[1]);
 
+            // More black magic
             byte[] encrypted = Arrays.copyOfRange(cipherData, 16, cipherData.length);
             Cipher aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding");
             aesCBC.init(Cipher.DECRYPT_MODE, key, iv);
             byte[] decryptedData = aesCBC.doFinal(encrypted);
             decrypted = new String(decryptedData, StandardCharsets.UTF_8);
-//            decrypted = decrypted.replace("[","");
-//            decrypted = decrypted.replace("]", "");
-            System.out.println("Decrypted Text: " + decrypted);
         }
         catch (Exception e)
         {
             System.out.println("Error while decrypting: " + e.toString());
         }
 
+        // Assuming the decryption was successful so the length will be greater than 0, build a JSON object to return
+        // otherwise return null.
         if (decrypted.length() > 0) {
 
-//            JSONArray decryptedData = new JSONArray(decrypted);
-//            System.out.println("JSONArray: " + decryptedData);
             JSONObject data = new JSONObject();
             data.put("keyword", "POST");
             data.put("token", token);
             data.put("secret", secret);
             data.put("urlEndPoint", "/v2/programs/" + program + "/participants");
             data.put("programID", program);
-//            data.put("body", decryptedData);
             data.put("body", decrypted);
             return data;
         } else {
@@ -135,72 +152,79 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
+    /*
+     *  DO GET
+     *  INPUT: request and response parameters inherited from HttpServlet
+     *  DESCRIPTION: Performs the received request. Takes in the parameters from GET, assigns them to variables that
+     *  can be used in api, decrypts and builds JSON object that will be used for request to SV, makes request, and
+     *  displays new page based on request status.
+     *  OUTPUT: HTML page to display.
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         String secret = request.getParameter("secret");
         String program = request.getParameter("programID");
-//        String participantData = text;
         String participantData = request.getParameter("body");
+
+        // Since http requests interpret "+" as " ", this has to be fixed prior to decrypting data so it can decrypt data
         participantData = participantData.replace(" ", "+");
+
+        // Initialize JSON object
         JSONObject decryptedData;
 
-        // TODO: Build full decrypter() that returns a JSONObject
+        // function call returns a JSON object that is assigned to decryptedData.
         decryptedData = decrypt(token, secret, program, participantData);
 
 
-        /*
-         *  Make sure there is content in decryptedData first otherwise there will be tons of errors.
-         */
+        // Make sure there is content in decryptedData first otherwise there will be tons of errors.
         if (decryptedData != null) {
 
-            /*
-             *  Once JSON object is created, check for decryptedData has "body" property. If it has "body", create
-             *  a new signature builder object and then try making the request. If it does not have the property,
-             *  just create a new page with information.
-             */
+            // Once JSON object is created, check for decryptedData has "body" property. If it has "body", create
+            // a new signature builder object and then try making the request. If it does not have the property,
+            // just create a new page with information.
             if (decryptedData.has("body")) {
 
-
+                // Creates a new SignatureBuilder object that prepares the data for a POST request
                 SignatureBuilder upsertParticipants = new SignatureBuilder(
                         decryptedData.getString("keyword"),
                         decryptedData.getString("token"),
                         decryptedData.getString("secret"),
                         decryptedData.getString("urlEndPoint"),
                         decryptedData.getString("body"),
-//                        decryptedData.getJSONArray("body"),
                         decryptedData.getString("programID"),
                         participantData);
 
-
+                // Attempt a POST request
                 try {
                     upsertParticipants.makePostRequest();
                 } finally {
+                    // Successful request will respond with a page that says successful
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
-                        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
-                                + upsertParticipants.getStatus() + ".</h1><h2>Token Used: " + upsertParticipants.getToken() + "</h2><h2>Secret Used: "
-                                + upsertParticipants.getSecret() + "</h2><h2>Keyword Used: " + upsertParticipants.getKeyword() + "</h2><h2>Endpoint Used: "
-                                + upsertParticipants.getUrlEndPoint();
-
-                        if (upsertParticipants.getKeyword().equals("POST")) {
-                            fail = fail + "</h2><h2>Body Param Used: " + upsertParticipants.getData() + "</h2><h2>Body Used: " + upsertParticipants.getBody() + "</h2><h2>Participant Data Used: " + upsertParticipants.getEverything();
-                        }
-
-                        fail = fail + "</h2><h2>Timestamp Used: " + upsertParticipants.getTimeStamp() + "</h2><h2>Signature Used: "
-                                + upsertParticipants.getSignature() + "</h2><h2>Encrypted Signature Used: " + upsertParticipants.getEncryptedSignature() +
-                                "</h2><h2>Authorization Used: " + upsertParticipants.getAuthorization() + "</h2><h2>Response received: "
-                                + upsertParticipants.getResponseBody() + "</h2><h3>Decrypted Value: " + decrypted + "</h3></body></html>";
+//                        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
+//                                + upsertParticipants.getStatus() + ".</h1><h2>Token Used: " + upsertParticipants.getToken() + "</h2><h2>Secret Used: "
+//                                + upsertParticipants.getSecret() + "</h2><h2>Keyword Used: " + upsertParticipants.getKeyword() + "</h2><h2>Endpoint Used: "
+//                                + upsertParticipants.getUrlEndPoint();
+//
+//                        if (upsertParticipants.getKeyword().equals("POST")) {
+//                            fail = fail + "</h2><h2>Body Param Used: " + upsertParticipants.getData() + "</h2><h2>Body Used: " + upsertParticipants.getBody() + "</h2><h2>Participant Data Used: " + upsertParticipants.getEverything();
+//                        }
+//
+//                        fail = fail + "</h2><h2>Timestamp Used: " + upsertParticipants.getTimeStamp() + "</h2><h2>Signature Used: "
+//                                + upsertParticipants.getSignature() + "</h2><h2>Encrypted Signature Used: " + upsertParticipants.getEncryptedSignature() +
+//                                "</h2><h2>Authorization Used: " + upsertParticipants.getAuthorization() + "</h2><h2>Response received: "
+//                                + upsertParticipants.getResponseBody() + "</h2><h3>Decrypted Value: " + decrypted + "</h3></body></html>";
                         PrintWriter out = response.getWriter();
-                        out.print(fail);
+                        out.print(upsertParticipants.successfulRequest());
                     } else {
+                        // Unsuccessful request will respond with a page that says unsuccessful and a bunch of data to
+                        // understand what it was doing and what values it was working with
                         PrintWriter out = response.getWriter();
                         out.print(upsertParticipants.unsuccessfulRequest());
                     }
                 }
             } else {
 
-                /*
-                 *  Output for when body is empty/not set due to decryption not working
-                 */
+                // Output webpage for when body is empty/not set due to decryption not working
                 String fail = "<html><body><h1 align='center'>Your request was unsuccessful and has no \"body\" data.</h1>"
                         + "<h2>Token Used: " + decryptedData.getString("token") + "</h2><h2>Secret Used: "
                         + decryptedData.getString("secret") + "</h2><h2>Keyword Used: " + decryptedData.getString("keyword")
@@ -212,14 +236,11 @@ public class UpsertParticipants extends HttpServlet {
                 out.print(fail);
             }
         } else {
-            /*
-             *  Output for when decryptData was not created properly
-             */
+            // Output webpage for when decryptData was not created properly
             PrintWriter out = response.getWriter();
             out.print("<html><body><h1 align='center'>\"decryptedData\" was not created successfully...</h1><h2>decryptedData value: "
                     + decryptedData + "</h2><h2>decryptedMessageBytes value: " + decryptedMessageBytes + "</h2><h2>participantDataAsBytes value: "
-                    + participantDataAsBytes +"</h2><h2>encryptionKeyBytes value: " + encryptionKeyBytes + "</h2><h2>secretKey value(as a string): "
-                    + secretKey.toString() + "</h2></body></html>");
+                    + participantDataAsBytes +"</h2><h2>encryptionKeyBytes value: " + encryptionKeyBytes + "</h2></body></html>");
         }
     }
 }

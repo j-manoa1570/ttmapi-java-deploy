@@ -20,10 +20,8 @@ public class SignatureBuilder {
     private String secret;
     private String urlEndPoint;
     private String body;
-    private JSONArray bodyJSONArray;
     private String timeStamp;
     private String programID;
-    private String requestType;
     private String everything;
     private String signature;
     private String encryptedSignature;
@@ -31,9 +29,6 @@ public class SignatureBuilder {
     private int status = 9000;
     private String responseBody;
     private String data;
-    // Arrays that are used when formatting strings
-//    private String[] badbody = new String[] {"[","]",", "," ","/_"};
-//    private String[] goodbody = new String[] {"","","\n",",", " "};
 
     private String[] badbody = new String[] {", ","][","[","]"};
     private String[] goodbody = new String[] {",","\n","",""};
@@ -49,51 +44,57 @@ public class SignatureBuilder {
      *  Constructor for building a POST signature
      */
     SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID, String data) {
-        System.out.println("Creating object...");
         this.programID = programID;
         this.data = data;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
 
-    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, JSONArray body, String programID, String data) {
-        this.programID = programID;
-        this.data = data;
-        initializeEverything(keyword, token, secret, urlEndPoint, body);
-    }
+    /*
+     *  CODE USED TO BUILD SIGNATURE BUILDER WHEN BODY IS A JSON ARRAY INSTEAD OF OBJECT
+     */
+//    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, JSONArray body, String programID, String data) {
+//        this.programID = programID;
+//        this.data = data;
+//        initializeEverything(keyword, token, secret, urlEndPoint, body);
+//    }
 
-    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, JSONArray body) {
-        System.out.println("Initializing Variables...");
-        this.keyword = keyword;
-        this.token = token;
-        this.secret = secret;
-        this.urlEndPoint = urlEndPoint;
-        this.body = body.toString();
-        setTimeStamp();
-        if (keyword.equals("POST")) {
-            this.body = bodyFormatter(this.body);
-            this.everything = this.body;
-            this.body = strStripper(this.body);
-            this.body = JSONBuilder();
-        } else {
-            this.body = "";
-        }
-        this.signature = sigBuilder();
-        this.encryptedSignature = encrypter();
-        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
-        System.out.println("Variables Initialized!");
-    }
+//    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, JSONArray body) {
+//        System.out.println("Initializing Variables...");
+//        this.keyword = keyword;
+//        this.token = token;
+//        this.secret = secret;
+//        this.urlEndPoint = urlEndPoint;
+//        this.body = body.toString();
+//        setTimeStamp();
+//        if (keyword.equals("POST")) {
+//            this.body = bodyFormatter(this.body);
+//            this.everything = this.body;
+//            this.body = strStripper(this.body);
+//            this.body = JSONBuilder();
+//        } else {
+//            this.body = "";
+//        }
+//        this.signature = sigBuilder();
+//        this.encryptedSignature = encrypter();
+//        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
+//        System.out.println("Variables Initialized!");
+//    }
 
+
+    /*
+     *  INITIALIZE EVERYTHING
+     *  INPUT: keyword, token, secret, urlEndPoint, body
+     *  DESCRIPTION: Initializes everything for a string builder object.
+     */
     private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body) {
-        System.out.println("Initializing Variables...");
         this.keyword = keyword;
         this.token = token;
         this.secret = secret;
         this.urlEndPoint = urlEndPoint;
         setTimeStamp();
+        System.out.println("STEP 1: Gathered all necessary information");
         if (keyword.equals("POST")) {
-            System.out.println("Initializing Keyword Accepted...");
             this.body = bodyFormatter(body);
-            System.out.println("Assigning Body To Everything...");
             this.everything = this.body;
             this.body = strStripper(this.body);
             this.body = JSONBuilder();
@@ -103,9 +104,10 @@ public class SignatureBuilder {
         this.signature = sigBuilder();
         this.encryptedSignature = encrypter();
         this.authorization = "SignalVine " + token + ":" + encryptedSignature;
-        System.out.println("Variables Initialized!");
     }
 
+    // Get/set functions for every variable. Aren't used a whole lot as this API currently does not have an admin panel
+    // to do things on but if one is every needed to be built, these functions would get heavy use out of it.
     public String getKeyword() { return keyword; }
     public String getToken() { return token; }
     public String getSecret() { return secret; }
@@ -178,23 +180,26 @@ public class SignatureBuilder {
     /*
      *  ENCRYPTER
      *  INPUT: signature, secret
-     *  DESCRIPTION: Using SHA256, the signature is encrypted with the secret
-     *  that is associated with a valid user (me) and encodes the new
-     *  encrypted signature as base 64.
+     *  DESCRIPTION: Using SHA256, the signature is encrypted with the secret that is associated with a valid user (me)
+     *  and encodes the new encrypted signature as base 64. This is used for SV. Currently no encryption for sending back
+     *  to WIX or to a data base.
      *  OUTPUT: encryptedSignature
      */
     private String encrypter() {
         String encryptedSignature = "";
         try
         {
+            // set MAC object to type HmacSHA256 for encoding and initialize hashing algorithm
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             sha256_HMAC.init(secret_key);
             Base64.Encoder encoder = Base64.getEncoder();
+
+            // encode hash
             encryptedSignature = encoder.encodeToString(sha256_HMAC.doFinal(signature.getBytes()));
         }
         catch (Exception error) {
-            System.out.println("ERROR: Could not encrypt message!!!");
+            System.out.println("ERROR: Could not encrypt message!!!" + error);
         }
         return encryptedSignature;
     }
@@ -208,7 +213,6 @@ public class SignatureBuilder {
      *  OUTPUT: A cleaned up string.
      * */
     private String strStripper (String toStrip) {
-        System.out.println("Stripping String...");
         for (int i = 0; i < badbody.length; i++) toStrip = toStrip.replace(badbody[i], goodbody[i]);
 
         return toStrip;
@@ -223,8 +227,6 @@ public class SignatureBuilder {
      *  OUTPUT: A string that is formatted and can be sent to SV with no problems.
      */
     private String JSONBuilder() {
-        System.out.println("Building JSON...");
-
         // Builds existing field for body
         String heading = body.substring(0,body.indexOf("\n"));
         heading = heading.replace(",", "\",\"");
@@ -261,21 +263,20 @@ public class SignatureBuilder {
      *  OUTPUT: String
      */
     private String bodyFormatter(String bodyParam) {
-        System.out.println("Formatting Body...");
 
+        // Turn JSON array (JSON encoded string) into JSON object (JSON encoded string) by removing the brackets
         String body = bodyParam;
         body = body.replace("[{", "{");
         body = body.replace("}]", "}");
 
-        System.out.println(bodyParam);
-
+        // Since the participant data is already in a JSON encoded string, build a JSON object to build a list of keys
+        // and a list of values to build a csv formatted string.
         JSONObject bodyData = new JSONObject(body);
-        System.out.println("Created JSONObject...");
         Iterator keys = bodyData.keys();
         List<String> fieldTypes = new LinkedList<String>();
         List<String> fieldValues = new LinkedList<String>();
 
-        System.out.println("Created new JSONObject, Iterator, and List<String>");
+        // Grab keys and values place them into their respective lists. Do not include WIX stuff.
         while (keys.hasNext()) {
             String dynamicKey = (String) keys.next();
             if (!dynamicKey.equals("_id") && !dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
@@ -283,14 +284,18 @@ public class SignatureBuilder {
                 fieldValues.add(bodyData.getString(dynamicKey));
             }
         }
+
+        // return a single csv encoded string
         return new String(fieldTypes.toString() + fieldValues.toString());
     }
 
+    // TODO: Consolidate the two request functions below into one since they can be one.
+
     /*
      *  MAKE GET REQUEST
-     *  INPUT:
-     *  DESCRIPTION:
-     *  OUTPUT:
+     *  INPUT: urlEndPoint, keyword, authorization, timeStamp
+     *  DESCRIPTION: Creates a new request to be sent to SV API.
+     *  OUTPUT: Request status that will determine whether to let user know it was succecssful or not.
      */
     public void makeGetRequest() {
 
@@ -334,10 +339,10 @@ public class SignatureBuilder {
     }
 
     /*
-     *  MAKE REQUEST
+     *  MAKE POST REQUEST
      *  INPUT: urlEndPoint, keyword, authorization, timeStamp
      *  DESCRIPTION: Creates a new request to be sent to SV API.
-     *  OUTPUT:
+     *  OUTPUT: Request status that will determine whether to let user know it was succecssful or not.
      */
     public void makePostRequest()  {
         String url = "https://theseus-api.signalvine.com" + urlEndPoint;
@@ -348,11 +353,6 @@ public class SignatureBuilder {
             // Attempts url by first creating a url object (HttpURLConnection)
             HttpURLConnection con = (HttpURLConnection) hostSite.openConnection();
             try {
-
-                /**
-                 * Still not working I think it is the data format that is not working correctly in here.
-                 * make sure that the data being written is correct in either the authorization or the post body
-                 */
 
                 // Sets parameters (url type and header)
                 con.setRequestMethod(keyword);
@@ -365,12 +365,11 @@ public class SignatureBuilder {
 
                 System.out.println("STEP 5: Built Request Statement");
 
-                /*
+                /**
                  * STEP 6 make connection
                  * */
                 con.connect();
 
-//                System.out.println(outputObject);
                 //Send data to the api
                 OutputStream out = con.getOutputStream();
                 byte[] input = body.getBytes("utf-8");

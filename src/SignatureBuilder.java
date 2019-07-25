@@ -412,7 +412,7 @@ public class SignatureBuilder {
      *  OUTPUT: Success string
      */
     public String successfulRequest() {
-        return "<html><body><h1 align='center'>Your request was successful!</h1></body></html>";
+        return "<html><body><h1 align='center'>Your request was successful!</h1><h3 align='center'>" + getResponseBody() + "</h3></body></html>";
     }
 
     /*

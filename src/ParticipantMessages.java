@@ -10,10 +10,10 @@ import java.io.PrintWriter;
 
 
 /*
- *  LIST PROGRAMS
+ *  PARTICIPANT MESSAGES
  *  This servlet will build the request to list all programs that an participant is connected with.
  *  Documentation shows that the request will be:
- *  GET https://theseus-api.signalvine.com/v1/participants/<participant id>/programs
+ *  GET https://theseus-api.signalvine.com/v1/participants/<participant id>/messages
  *
  */
 
@@ -36,18 +36,20 @@ public class ParticipantMessages extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String token = request.getParameter("token");
-        String secret = request.getParameter("secret");
-        String participantID = request.getParameter("participantID");
-
-        JSONObject decryptedData;
-        // TODO: Build decrypter() that returns a JSONObject
-        decryptedData = decrypt(token, secret, participantID);
-
-
-        SignatureBuilder participantMessages = new SignatureBuilder(decryptedData.getString("keyword"),
-                decryptedData.getString("token"), decryptedData.getString("secret"),
-                decryptedData.getString("urlEndPoint"));
+//        String token = request.getParameter("token");
+//        String secret = request.getParameter("secret");
+//        String participantID = request.getParameter("participantID");
+//
+//        JSONObject decryptedData;
+//        // TODO: Build decrypter() that returns a JSONObject
+//        decryptedData = decrypt(token, secret, participantID);
+//
+//
+//        SignatureBuilder participantMessages = new SignatureBuilder(decryptedData.getString("keyword"),
+//                decryptedData.getString("token"), decryptedData.getString("secret"),
+//                decryptedData.getString("urlEndPoint"));
+        SignatureBuilder participantMessages = new SignatureBuilder("GET", request.getParameter("token"),
+                request.getParameter("secret"), "/v1/participants/" + request.getParameter("participantID") + "/messages");
 
         try {
             participantMessages.makeGetRequest();

@@ -200,19 +200,6 @@ public class UpsertParticipants extends HttpServlet {
                 } finally {
                     // Successful request will respond with a page that says successful
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
-//                        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and returned HTTP Response code "
-//                                + upsertParticipants.getStatus() + ".</h1><h2>Token Used: " + upsertParticipants.getToken() + "</h2><h2>Secret Used: "
-//                                + upsertParticipants.getSecret() + "</h2><h2>Keyword Used: " + upsertParticipants.getKeyword() + "</h2><h2>Endpoint Used: "
-//                                + upsertParticipants.getUrlEndPoint();
-//
-//                        if (upsertParticipants.getKeyword().equals("POST")) {
-//                            fail = fail + "</h2><h2>Body Param Used: " + upsertParticipants.getData() + "</h2><h2>Body Used: " + upsertParticipants.getBody() + "</h2><h2>Participant Data Used: " + upsertParticipants.getEverything();
-//                        }
-//
-//                        fail = fail + "</h2><h2>Timestamp Used: " + upsertParticipants.getTimeStamp() + "</h2><h2>Signature Used: "
-//                                + upsertParticipants.getSignature() + "</h2><h2>Encrypted Signature Used: " + upsertParticipants.getEncryptedSignature() +
-//                                "</h2><h2>Authorization Used: " + upsertParticipants.getAuthorization() + "</h2><h2>Response received: "
-//                                + upsertParticipants.getResponseBody() + "</h2><h3>Decrypted Value: " + decrypted + "</h3></body></html>";
                         PrintWriter out = response.getWriter();
                         out.print(upsertParticipants.successfulRequest());
                     } else {

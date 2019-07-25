@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Signature;
 
 
 /*
@@ -36,18 +37,21 @@ public class ListParticipants extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String token = request.getParameter("token");
-        String secret = request.getParameter("secret");
-        String accountID = request.getParameter("accountID");
+//        String token = request.getParameter("token");
+//        String secret = request.getParameter("secret");
+//        String accountID = request.getParameter("accountID");
+//
+//        JSONObject decryptedData;
+//        // TODO: Build decrypter() that returns a JSONObject
+//        decryptedData = decrypt(token, secret, accountID);
+//
+//
+//        SignatureBuilder listParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
+//                decryptedData.getString("token"), decryptedData.getString("secret"),
+//                decryptedData.getString("urlEndPoint"));
 
-        JSONObject decryptedData;
-        // TODO: Build decrypter() that returns a JSONObject
-        decryptedData = decrypt(token, secret, accountID);
-
-
-        SignatureBuilder listParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
-                decryptedData.getString("token"), decryptedData.getString("secret"),
-                decryptedData.getString("urlEndPoint"));
+        SignatureBuilder listParticipants = new SignatureBuilder("GET", request.getParameter("token"),
+                request.getParameter("secret"), "/v1/programs/" + request.getParameter("accountID") + "/participants");
 
         try {
             listParticipants.makeGetRequest();

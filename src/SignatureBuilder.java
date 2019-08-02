@@ -48,6 +48,14 @@ public class SignatureBuilder {
         this.data = data;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
+    /*
+     *  Constructor for building a POST signature
+     */
+    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID, String data, boolean multi) {
+        this.programID = programID;
+        this.data = data;
+        initializeEverything(keyword, token, secret, urlEndPoint, body, true);
+    }
 
     /*
      *  CODE USED TO BUILD SIGNATURE BUILDER WHEN BODY IS A JSON ARRAY INSTEAD OF OBJECT
@@ -94,7 +102,32 @@ public class SignatureBuilder {
         setTimeStamp();
         System.out.println("STEP 1: Gathered all necessary information");
         if (keyword.equals("POST")) {
-            this.body = bodyFormatter(body);
+            this.body = bodyFormatterMulti(body);
+            this.everything = this.body;
+            this.body = strStripper(this.body);
+            this.body = JSONBuilder();
+        } else {
+            this.body = "";
+        }
+        this.signature = sigBuilder();
+        this.encryptedSignature = encrypter();
+        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
+    }
+
+    /*
+     *  INITIALIZE EVERYTHING
+     *  INPUT: keyword, token, secret, urlEndPoint, body
+     *  DESCRIPTION: Initializes everything for a string builder object.
+     */
+    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body, boolean multi) {
+        this.keyword = keyword;
+        this.token = token;
+        this.secret = secret;
+        this.urlEndPoint = urlEndPoint;
+        setTimeStamp();
+        System.out.println("STEP 1: Gathered all necessary information");
+        if (keyword.equals("POST")) {
+            this.body = bodyFormatterMulti(body);
             this.everything = this.body;
             this.body = strStripper(this.body);
             this.body = JSONBuilder();
@@ -214,7 +247,8 @@ public class SignatureBuilder {
      * */
     private String strStripper (String toStrip) {
         for (int i = 0; i < badbody.length; i++) toStrip = toStrip.replace(badbody[i], goodbody[i]);
-
+        toStrip = toStrip.replace(",\n,","\n");
+        System.out.println("Body after strStripper(): " + toStrip);
         return toStrip;
     }
 
@@ -253,6 +287,96 @@ public class SignatureBuilder {
         System.out.println("STEP 3 JSON as a string:" + testStr);
 
         return testStr;
+    }
+
+    /*
+     *  BODY FORMATTER MULTI
+     *  INPUT: JSON formatted string
+     *  DESCRIPTION: Takes a JSON string, splits up the field types and field values into separate lists, and
+     *               returns a string version of the two lists.
+     *  OUTPUT: String
+     */
+    private String bodyFormatterMulti(String bodyParam) {
+
+        // Turn JSON array (JSON encoded string) into JSON object (JSON encoded string) by removing the brackets
+        String body = bodyParam;
+        body = body.replace("[{", "{");
+        body = body.replace("}]", "}");
+
+        // Get a list of all JSON objects
+        List<JSONObject> records = recordBuilder(body);
+
+        // Since the participant data is already in a JSON encoded string, build a JSON object to build a list of keys
+        // and a list of values to build a csv formatted string.
+        List<String> fieldTypes = new LinkedList<String>();
+        List<String> fieldValues = new LinkedList<String>();
+
+        // Iterate through list to view each object
+        for (int i = 0; i < records.size(); i++) {
+
+            Iterator keys = records.get(i).keys();
+            // If the object isn't the first one
+            if (i != 0) {
+                fieldValues.add("\n");
+
+                // Since we already have all keys that are needed, just grab values.
+                while (keys.hasNext()) {
+                    String dynamicKey = (String) keys.next();
+                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
+                        fieldValues.add(records.get(i).getString(dynamicKey));
+                    }
+                }
+                // If the object is the first one
+            } else {
+
+                // Loop through the JSON object
+                while (keys.hasNext()) {
+                    String dynamicKey = (String) keys.next();
+
+                    // We don't want to grab the createdDate or the updatedDate key/value pairs in JSON
+                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
+
+                        // If it is the id, reformat it to customer_id so signal vine will accept
+                        if (dynamicKey.equals("_id")) {
+                            fieldTypes.add("customer_id");
+                            fieldValues.add(records.get(i).getString(dynamicKey));
+                        } else {
+
+                            // Add the key/value pair
+                            fieldTypes.add(dynamicKey);
+                            fieldValues.add(records.get(i).getString(dynamicKey));
+                        }
+                    }
+                }
+            }
+        }
+
+        // return a single csv encoded string
+        return new String(fieldTypes.toString() + fieldValues.toString());
+    }
+
+    /*
+     *  RECORD BUILDER
+     *  INPUT: JSON formatted string containing multiple JSON objects
+     *  DESCRIPTION: Takes string and cuts it up into JSON objects and placed into a list.
+     */
+    private List<JSONObject> recordBuilder(String body) {
+        List<JSONObject> records = new LinkedList<>();
+        String substring;
+        int start = 0;
+
+        // Cut the string up and insert into list as JSONObjects
+        for (int i = 1; i < body.length(); i++) {
+            if (body.charAt(i) == '}') {
+                substring = body.substring(start,i + 1);
+                records.add(new JSONObject(substring));
+            } else if (body.charAt(i) == '{') {
+                start = i;
+            }
+        }
+
+
+        return records;
     }
 
     /*

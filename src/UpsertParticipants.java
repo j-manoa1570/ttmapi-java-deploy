@@ -203,7 +203,7 @@ public class UpsertParticipants extends HttpServlet {
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
                         PrintWriter out = response.getWriter();
                         out.print(upsertParticipants.successfulRequest());
-                        response.setStatus(200);
+                        response.setStatus(HttpServletResponse.SC_OK);
                     } else {
                         // Unsuccessful request will respond with a page that says unsuccessful and a bunch of data to
                         // understand what it was doing and what values it was working with

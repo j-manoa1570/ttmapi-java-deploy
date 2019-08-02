@@ -48,46 +48,6 @@ public class SignatureBuilder {
         this.data = data;
         initializeEverything(keyword, token, secret, urlEndPoint, body);
     }
-    /*
-     *  Constructor for building a POST signature
-     */
-    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, String body, String programID, String data, boolean multi) {
-        this.programID = programID;
-        this.data = data;
-        initializeEverything(keyword, token, secret, urlEndPoint, body, true);
-    }
-
-    /*
-     *  CODE USED TO BUILD SIGNATURE BUILDER WHEN BODY IS A JSON ARRAY INSTEAD OF OBJECT
-     */
-//    SignatureBuilder(String keyword, String token, String secret, String urlEndPoint, JSONArray body, String programID, String data) {
-//        this.programID = programID;
-//        this.data = data;
-//        initializeEverything(keyword, token, secret, urlEndPoint, body);
-//    }
-
-//    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, JSONArray body) {
-//        System.out.println("Initializing Variables...");
-//        this.keyword = keyword;
-//        this.token = token;
-//        this.secret = secret;
-//        this.urlEndPoint = urlEndPoint;
-//        this.body = body.toString();
-//        setTimeStamp();
-//        if (keyword.equals("POST")) {
-//            this.body = bodyFormatter(this.body);
-//            this.everything = this.body;
-//            this.body = strStripper(this.body);
-//            this.body = JSONBuilder();
-//        } else {
-//            this.body = "";
-//        }
-//        this.signature = sigBuilder();
-//        this.encryptedSignature = encrypter();
-//        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
-//        System.out.println("Variables Initialized!");
-//    }
-
 
     /*
      *  INITIALIZE EVERYTHING
@@ -95,31 +55,6 @@ public class SignatureBuilder {
      *  DESCRIPTION: Initializes everything for a string builder object.
      */
     private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body) {
-        this.keyword = keyword;
-        this.token = token;
-        this.secret = secret;
-        this.urlEndPoint = urlEndPoint;
-        setTimeStamp();
-        System.out.println("STEP 1: Gathered all necessary information");
-        if (keyword.equals("POST")) {
-            this.body = bodyFormatterMulti(body);
-            this.everything = this.body;
-            this.body = strStripper(this.body);
-            this.body = JSONBuilder();
-        } else {
-            this.body = "";
-        }
-        this.signature = sigBuilder();
-        this.encryptedSignature = encrypter();
-        this.authorization = "SignalVine " + token + ":" + encryptedSignature;
-    }
-
-    /*
-     *  INITIALIZE EVERYTHING
-     *  INPUT: keyword, token, secret, urlEndPoint, body
-     *  DESCRIPTION: Initializes everything for a string builder object.
-     */
-    private void initializeEverything(String keyword, String token, String secret, String urlEndPoint, String body, boolean multi) {
         this.keyword = keyword;
         this.token = token;
         this.secret = secret;
@@ -377,40 +312,6 @@ public class SignatureBuilder {
 
 
         return records;
-    }
-
-    /*
-     *  BODY FORMATTER
-     *  INPUT: JSON formatted string
-     *  DESCRIPTION: Takes a JSON string, splits up the field types and field values into separate lists, and
-     *               returns a string version of the two lists.
-     *  OUTPUT: String
-     */
-    private String bodyFormatter(String bodyParam) {
-
-        // Turn JSON array (JSON encoded string) into JSON object (JSON encoded string) by removing the brackets
-        String body = bodyParam;
-        body = body.replace("[{", "{");
-        body = body.replace("}]", "}");
-
-        // Since the participant data is already in a JSON encoded string, build a JSON object to build a list of keys
-        // and a list of values to build a csv formatted string.
-        JSONObject bodyData = new JSONObject(body);
-        Iterator keys = bodyData.keys();
-        List<String> fieldTypes = new LinkedList<String>();
-        List<String> fieldValues = new LinkedList<String>();
-
-        // Grab keys and values place them into their respective lists. Do not include WIX stuff.
-        while (keys.hasNext()) {
-            String dynamicKey = (String) keys.next();
-            if (!dynamicKey.equals("_id") && !dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
-                fieldTypes.add(dynamicKey);
-                fieldValues.add(bodyData.getString(dynamicKey));
-            }
-        }
-
-        // return a single csv encoded string
-        return new String(fieldTypes.toString() + fieldValues.toString());
     }
 
     // TODO: Consolidate the two request functions below into one since they can be one.

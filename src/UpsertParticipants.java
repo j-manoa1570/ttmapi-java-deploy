@@ -129,6 +129,7 @@ public class UpsertParticipants extends HttpServlet {
             aesCBC.init(Cipher.DECRYPT_MODE, key, iv);
             byte[] decryptedData = aesCBC.doFinal(encrypted);
             decrypted = new String(decryptedData, StandardCharsets.UTF_8);
+
         }
         catch (Exception e)
         {
@@ -202,11 +203,20 @@ public class UpsertParticipants extends HttpServlet {
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
                         PrintWriter out = response.getWriter();
                         out.print(upsertParticipants.successfulRequest());
+                        response.setStatus(200);
                     } else {
                         // Unsuccessful request will respond with a page that says unsuccessful and a bunch of data to
                         // understand what it was doing and what values it was working with
+                        String fail = "<html><body><h1 align='center'>Your request was unsuccessful and has no \"body\" data.</h1>"
+                                + "<h2>Token Used: " + decryptedData.getString("token") + "</h2><h2>Secret Used: "
+                                + decryptedData.getString("secret") + "</h2><h2>Keyword Used: " + decryptedData.getString("keyword")
+                                + "</h2><h2>Endpoint Used: " + decryptedData.getString("urlEndPoint")
+                                + "</h2><h2>Timestamp Used: " + "</h2><h2>Body Used: Not Set</h2><h2>Timestamp Used: Not Set"
+                                + "Not Set</h2><h2>Signature Used: Not Set</h2><h2>Encrypted Signature Used: Not Set</h2>"
+                                + "<h2>Authorization Used: Not Set</h2><h2>Response received: Not Set</h2></body></html>";
+
                         PrintWriter out = response.getWriter();
-                        out.print(upsertParticipants.unsuccessfulRequest());
+                        out.print(fail);
                     }
                 }
             } else {
@@ -226,8 +236,10 @@ public class UpsertParticipants extends HttpServlet {
             // Output webpage for when decryptData was not created properly
             PrintWriter out = response.getWriter();
             out.print("<html><body><h1 align='center'>\"decryptedData\" was not created successfully...</h1><h2>decryptedData value: "
-                    + decryptedData + "</h2><h2>decryptedMessageBytes value: " + decryptedMessageBytes + "</h2><h2>participantDataAsBytes value: "
-                    + participantDataAsBytes +"</h2><h2>encryptionKeyBytes value: " + encryptionKeyBytes + "</h2></body></html>");
+                    + decryptedData + "</h2><h2>decryptedMessageBytes value: " + decryptedMessageBytes + "</h2><h2>participantData value: "
+                    + participantData + "</h2><h2>Decrypted value is: " + decrypted + "</h2><h2>participantDataAsBytes value: "
+                    + participantDataAsBytes +"</h2><h2>encryptionKeyBytes value: "
+                    + encryptionKeyBytes + "</h2></body></html>");
         }
     }
 }

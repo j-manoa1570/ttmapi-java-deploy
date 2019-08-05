@@ -43,29 +43,13 @@ public class ProgramParticipants extends HttpServlet {
      *  for future additional functions.
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String token = request.getParameter("token");
-//        String secret = request.getParameter("secret");
-//        String accountID = request.getParameter("programID");
-//
-//        JSONObject decryptedData = new JSONObject();
-//        decryptedData.put("keyword","GET");
-//        decryptedData.put("token", request.getParameter("token"));
-//        decryptedData.put("secret", request.getParameter("secret"));
-//        decryptedData.put("urlEndPoint", "/v1/programs/" + request.getParameter("programID") + "/participants");
-        // TODO: Build decrypter() that returns a JSONObject
-//        decryptedData = decrypt(token, secret, accountID);
-
 
         SignatureBuilder programParticipants = new SignatureBuilder("GET",
                 request.getParameter("token"), request.getParameter("secret"),
                 "/v1/programs/" + request.getParameter("programID") + "/participants");
 
-//        SignatureBuilder programParticipants = new SignatureBuilder(decryptedData.getString("keyword"),
-//                decryptedData.getString("token"), decryptedData.getString("secret"),
-//                decryptedData.getString("urlEndPoint"));
-
         try {
-            programParticipants.makeGetRequest();
+            programParticipants.makeRequest();
         } finally {
             if (programParticipants.getStatus() == 200 || programParticipants.getStatus() == 202) {
                 PrintWriter out = response.getWriter();

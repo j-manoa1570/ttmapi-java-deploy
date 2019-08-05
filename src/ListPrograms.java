@@ -37,24 +37,13 @@ public class ListPrograms extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String token = request.getParameter("token");
-//        String secret = request.getParameter("secret");
-//        String account = request.getParameter("accountID");
-//
-//        JSONObject decryptedData;
-//        // TODO: Build full decrypter() that returns a JSONObject
-//        decryptedData = decrypt(token, secret, account);
-//
-//
-//        SignatureBuilder listPrograms = new SignatureBuilder(decryptedData.getString("keyword"),
-//                decryptedData.getString("token"), decryptedData.getString("secret"),
-//                decryptedData.getString("urlEndPoint"));
+
 
         SignatureBuilder listPrograms = new SignatureBuilder("GET", request.getParameter("token"),request.getParameter("secret"),
                 "/v1/accounts/" + request.getParameter("accountID") + "/programs");
 
         try {
-            listPrograms.makeGetRequest();
+            listPrograms.makeRequest();
         } finally {
             if (listPrograms.getStatus() == 200 || listPrograms.getStatus() == 202) {
                 PrintWriter out = response.getWriter();

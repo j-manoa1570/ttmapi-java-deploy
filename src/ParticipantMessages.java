@@ -52,7 +52,7 @@ public class ParticipantMessages extends HttpServlet {
                 request.getParameter("secret"), "/v1/participants/" + request.getParameter("participantID") + "/messages");
 
         try {
-            participantMessages.makeGetRequest();
+            participantMessages.makeRequest();
         } finally {
             if (participantMessages.getStatus() == 200 || participantMessages.getStatus() == 202) {
                 PrintWriter out = response.getWriter();

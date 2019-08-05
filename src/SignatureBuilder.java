@@ -367,7 +367,7 @@ public class SignatureBuilder {
      *  DESCRIPTION: Creates a new request to be sent to SV API.
      *  OUTPUT: Request status that will determine whether to let user know it was succecssful or not.
      */
-    public void makePostRequest()  {
+    public void makeRequest()  {
         String url = "https://theseus-api.signalvine.com" + urlEndPoint;
 
         try {
@@ -381,8 +381,10 @@ public class SignatureBuilder {
                 con.setRequestMethod(keyword);
                 con.setConnectTimeout(50000);
                 con.setReadTimeout(50000);
-                con.setDoOutput(true);
-                con.setRequestProperty("Content-Type", "application/json");
+                if (keyword=="POST") {
+                    con.setDoOutput(true);
+                    con.setRequestProperty("Content-Type", "application/json");
+                }
                 con.setRequestProperty("Authorization", authorization);
                 con.setRequestProperty("SignalVine-Date", timeStamp);
 
@@ -393,11 +395,14 @@ public class SignatureBuilder {
                  * */
                 con.connect();
 
-                //Send data to the api
-                OutputStream out = con.getOutputStream();
-                byte[] input = body.getBytes("utf-8");
-                out.write(input, 0, input.length);// here i sent the parameter
-                out.close();
+
+                //Send data to the api if it is a POST request
+                if (keyword == "POST") {
+                    OutputStream out = con.getOutputStream();
+                    byte[] input = body.getBytes("utf-8");
+                    out.write(input, 0, input.length);// here i sent the parameter
+                    out.close();
+                }
 
                 // Prepares status variable and print it
                 status = con.getResponseCode();

@@ -197,7 +197,7 @@ public class UpsertParticipants extends HttpServlet {
 
                 // Attempt a POST request
                 try {
-                    upsertParticipants.makePostRequest();
+                    upsertParticipants.makeRequest();
                 } finally {
                     // Successful request will respond with a page that says successful
                     if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {

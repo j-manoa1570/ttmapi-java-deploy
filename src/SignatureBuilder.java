@@ -15,6 +15,7 @@ import java.util.*;
 
 public class SignatureBuilder {
 
+    // Variables that are needed for building signature
     private String keyword;
     private String token;
     private String secret;
@@ -32,6 +33,34 @@ public class SignatureBuilder {
 
     private String[] badbody = new String[] {", ","][","[","]"};
     private String[] goodbody = new String[] {",","\n","",""};
+
+    // Get/set functions for every variable. Aren't used a whole lot as this API currently does not have an admin panel
+    // to do things on but if one is every needed to be built, these functions would get heavy use out of it.
+    public String getKeyword() { return keyword; }
+    public String getToken() { return token; }
+    public String getSecret() { return secret; }
+    public String getUrlEndPoint() { return urlEndPoint; }
+    public String getBody() { return body; }
+    public String getProgramID() { return programID; }
+    public String getTimeStamp() { return timeStamp; }
+    public String getSignature() { return signature; }
+    public String getEncryptedSignature() { return encryptedSignature; }
+    public String getAuthorization() { return authorization; }
+    public String getResponseBody() {return responseBody; }
+    public int getStatus() { return status; }
+    public String getEverything() { return everything; }
+    public String getData() { return data; }
+
+    public void setKeyword(String keyword) { this.keyword = keyword; }
+    public void setToken(String token) { this.token = token; }
+    public void setSecret(String secret) { this.secret = secret; }
+    public void setUrlEndPoint(String urlEndPoint) { this.urlEndPoint = urlEndPoint; }
+    public void setBody(String body) { this.body = body; }
+    public void setProgramID(String programID) { this.programID = programID; }
+    public void setSignature() { this.signature = sigBuilder(); }
+    public void setEncryptedSignature() { this.encryptedSignature = encrypter(); }
+    public void setAuthorization() { this.authorization = "SignalVine " + token + ":" + encryptedSignature; }
+    public void setStatus(int status) { this.status = status; }
 
     /*
      *  Constructor for building a GET signature
@@ -73,34 +102,6 @@ public class SignatureBuilder {
         this.encryptedSignature = encrypter();
         this.authorization = "SignalVine " + token + ":" + encryptedSignature;
     }
-
-    // Get/set functions for every variable. Aren't used a whole lot as this API currently does not have an admin panel
-    // to do things on but if one is every needed to be built, these functions would get heavy use out of it.
-    public String getKeyword() { return keyword; }
-    public String getToken() { return token; }
-    public String getSecret() { return secret; }
-    public String getUrlEndPoint() { return urlEndPoint; }
-    public String getBody() { return body; }
-    public String getProgramID() { return programID; }
-    public String getTimeStamp() { return timeStamp; }
-    public String getSignature() { return signature; }
-    public String getEncryptedSignature() { return encryptedSignature; }
-    public String getAuthorization() { return authorization; }
-    public String getResponseBody() {return responseBody; }
-    public int getStatus() { return status; }
-    public String getEverything() { return everything; }
-    public String getData() { return data; }
-
-    public void setKeyword(String keyword) { this.keyword = keyword; }
-    public void setToken(String token) { this.token = token; }
-    public void setSecret(String secret) { this.secret = secret; }
-    public void setUrlEndPoint(String urlEndPoint) { this.urlEndPoint = urlEndPoint; }
-    public void setBody(String body) { this.body = body; }
-    public void setProgramID(String programID) { this.programID = programID; }
-    public void setSignature() { this.signature = sigBuilder(); }
-    public void setEncryptedSignature() { this.encryptedSignature = encrypter(); }
-    public void setAuthorization() { this.authorization = "SignalVine " + token + ":" + encryptedSignature; }
-    public void setStatus(int status) { this.status = status; }
 
     /*
      *  SET TIME STAMP
@@ -312,60 +313,11 @@ public class SignatureBuilder {
         return records;
     }
 
-    // TODO: Consolidate the two request functions below into one since they can be one.
-
     /*
-     *  MAKE GET REQUEST
+     *  MAKE REQUEST
      *  INPUT: urlEndPoint, keyword, authorization, timeStamp
      *  DESCRIPTION: Creates a new request to be sent to SV API.
-     *  OUTPUT: Request status that will determine whether to let user know it was succecssful or not.
-     */
-    public void makeGetRequest() {
-
-        String url = "https://theseus-api.signalvine.com" + urlEndPoint;
-
-        try {
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            try {
-            // optional default is GET
-                //con.setRequestMethod(keyword);
-                con.setConnectTimeout(50000);
-                con.setReadTimeout(50000);
-//                con.setDoOutput(true);
-                con.setRequestProperty("Authorization", authorization);
-                con.setRequestProperty("SignalVine-Date", timeStamp);
-
-                status = con.getResponseCode();
-                System.out.println("\nSending 'GET' request to URL : " + url);
-                System.out.println("Response Code : " + status);
-
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) response.append(inputLine);
-                in.close();
-                System.out.println(response);
-                responseBody = response.toString();
-            }
-            finally {
-                con.disconnect();
-            }
-        } catch (MalformedURLException malformed) {
-            System.out.println(malformed);
-        } catch (IOException io) {
-            System.out.println(io);
-        }
-    }
-
-    /*
-     *  MAKE POST REQUEST
-     *  INPUT: urlEndPoint, keyword, authorization, timeStamp
-     *  DESCRIPTION: Creates a new request to be sent to SV API.
-     *  OUTPUT: Request status that will determine whether to let user know it was succecssful or not.
+     *  OUTPUT: Request status that will determine whether to let user know it was successful or not.
      */
     public void makeRequest()  {
         String url = "https://theseus-api.signalvine.com" + urlEndPoint;

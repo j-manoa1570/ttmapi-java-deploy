@@ -19,15 +19,6 @@ import java.io.PrintWriter;
 public class ProgramParticipants extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String account) {
-        JSONObject data = new JSONObject();
-        data.put("keyword", "GET");
-        data.put("token", token);
-        data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/programs/" + account + "/participants");
-        return data;
-    }
-
     public ProgramParticipants() {
         super();
     }

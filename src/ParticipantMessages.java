@@ -22,32 +22,12 @@ import java.io.PrintWriter;
 public class ParticipantMessages extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String participant) {
-        JSONObject data = new JSONObject();
-        data.put("keyword", "GET");
-        data.put("token", token);
-        data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/participants/" + participant + "/messages");
-        return data;
-    }
-
     public ParticipantMessages() {
         super();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String token = request.getParameter("token");
-//        String secret = request.getParameter("secret");
-//        String participantID = request.getParameter("participantID");
-//
-//        JSONObject decryptedData;
-//        // TODO: Build decrypter() that returns a JSONObject
-//        decryptedData = decrypt(token, secret, participantID);
-//
-//
-//        SignatureBuilder participantMessages = new SignatureBuilder(decryptedData.getString("keyword"),
-//                decryptedData.getString("token"), decryptedData.getString("secret"),
-//                decryptedData.getString("urlEndPoint"));
+
         SignatureBuilder participantMessages = new SignatureBuilder("GET", request.getParameter("token"),
                 request.getParameter("secret"), "/v1/participants/" + request.getParameter("participantID") + "/messages");
 

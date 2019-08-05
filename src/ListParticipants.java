@@ -23,15 +23,6 @@ import java.security.Signature;
 public class ListParticipants extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String program) {
-        JSONObject data = new JSONObject();
-        data.put("keyword", "GET");
-        data.put("token", token);
-        data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/programs/" + program + "/participants");
-        return data;
-    }
-
     public ListParticipants() {
         super();
     }

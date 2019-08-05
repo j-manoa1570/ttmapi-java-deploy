@@ -23,15 +23,6 @@ import java.io.PrintWriter;
 public class ListPrograms extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private JSONObject decrypt(String token, String secret, String account) {
-        JSONObject data = new JSONObject();
-        data.put("keyword", "GET");
-        data.put("token", token);
-        data.put("secret", secret);
-        data.put("urlEndPoint", "/v1/accounts/" + account + "/programs");
-        return data;
-    }
-
     public ListPrograms() {
         super();
     }

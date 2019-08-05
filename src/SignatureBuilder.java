@@ -257,7 +257,7 @@ public class SignatureBuilder {
                 // Since we already have all keys that are needed, just grab values.
                 while (keys.hasNext()) {
                     String dynamicKey = (String) keys.next();
-                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
+                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate") && !dynamicKey.equals("submitted")) {
                         fieldValues.add(records.get(i).getString(dynamicKey));
                     }
                 }
@@ -268,19 +268,17 @@ public class SignatureBuilder {
                 while (keys.hasNext()) {
                     String dynamicKey = (String) keys.next();
 
-                    // We don't want to grab the createdDate or the updatedDate key/value pairs in JSON
-                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate")) {
+                    // We don't want to grab the createdDate, updatedDate, or submitted key/value pairs in JSON
+                    if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate") && !dynamicKey.equals("submitted")) {
 
                         // If it is the id, reformat it to customer_id so signal vine will accept
                         if (dynamicKey.equals("_id")) {
                             fieldTypes.add("customer_id");
-                            fieldValues.add(records.get(i).getString(dynamicKey));
                         } else {
-
                             // Add the key/value pair
                             fieldTypes.add(dynamicKey);
-                            fieldValues.add(records.get(i).getString(dynamicKey));
                         }
+                        fieldValues.add(records.get(i).getString(dynamicKey));
                     }
                 }
             }

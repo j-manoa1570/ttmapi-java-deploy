@@ -10,11 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4fa3602-61fa-4d52-b013-43f1d3a3c4eb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/web/account_setup.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/test.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/SignatureBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/SignatureBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ttmapi-deploy/SignatureBuilder.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SignatureBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SignatureBuilder.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -59,8 +55,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/SignatureBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="537">
-              <caret line="292" column="21" selection-start-line="292" selection-start-column="21" selection-end-line="292" selection-end-column="21" />
+            <state relative-caret-position="282">
+              <caret line="277" column="134" lean-forward="true" selection-start-line="277" selection-start-column="134" selection-end-line="277" selection-end-column="134" />
             </state>
           </provider>
         </entry>
@@ -388,17 +384,17 @@
       <workItem from="1564512842431" duration="9195000" />
       <workItem from="1564671916495" duration="14278000" />
       <workItem from="1565017460307" duration="1917000" />
-      <workItem from="1565025520958" duration="4886000" />
+      <workItem from="1565025520958" duration="6426000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="139025000" />
+    <option name="totallyTimeSpent" value="140565000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28997868" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28997868" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -408,13 +404,13 @@
       <window_info id="Web" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49946696" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4904051" visible="true" weight="0.30119178" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4904051" weight="0.30119178" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49840087" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Application Servers" order="7" sideWeight="0.49840087" weight="0.32936078" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.48987207" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.48987207" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Docker" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Inspection Results" order="10" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5101279" side_tool="true" weight="0.32936078" />
@@ -572,8 +568,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SignatureBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="292" column="21" selection-start-line="292" selection-start-column="21" selection-end-line="292" selection-end-column="21" />
+        <state relative-caret-position="282">
+          <caret line="277" column="134" lean-forward="true" selection-start-line="277" selection-start-column="134" selection-end-line="277" selection-end-column="134" />
         </state>
       </provider>
     </entry>

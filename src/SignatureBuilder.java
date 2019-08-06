@@ -259,7 +259,12 @@ public class SignatureBuilder {
                 while (keys.hasNext()) {
                     String dynamicKey = (String) keys.next();
                     if (!dynamicKey.equals("_createdDate") && !dynamicKey.equals("_updatedDate") && !dynamicKey.equals("submitted")) {
-                        fieldValues.add(records.get(i).getString(dynamicKey));
+                        if (dynamicKey.equals("sv_start_date")) {
+                            String start = getTimeStamp().substring(0, 10);
+                            fieldValues.add(start);
+                        } else {
+                            fieldValues.add(records.get(i).getString(dynamicKey));
+                        }
                     }
                 }
                 // If the object is the first one
@@ -279,7 +284,12 @@ public class SignatureBuilder {
                             // Add the key/value pair
                             fieldTypes.add(dynamicKey);
                         }
-                        fieldValues.add(records.get(i).getString(dynamicKey));
+                        if (dynamicKey.equals("sv_start_date")) {
+                            String start = getTimeStamp().substring(0, 10);
+                            fieldValues.add(start);
+                        } else {
+                            fieldValues.add(records.get(i).getString(dynamicKey));
+                        }
                     }
                 }
             }

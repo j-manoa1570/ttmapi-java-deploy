@@ -1,4 +1,3 @@
-import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

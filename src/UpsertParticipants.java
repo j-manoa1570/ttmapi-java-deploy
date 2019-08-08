@@ -1,4 +1,6 @@
 import org.json.JSONObject;
+import sun.misc.IOUtils;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -7,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +17,9 @@ import java.security.DigestException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
-
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /*
@@ -153,6 +158,14 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
+    private String extractPostRequestBody(HttpServletRequest request) throws IOException {
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            Scanner s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        }
+        return "";
+    }
+
     /*
      *  DO GET
      *  INPUT: request and response parameters inherited from HttpServlet
@@ -240,6 +253,75 @@ public class UpsertParticipants extends HttpServlet {
                     + participantData + "</h2><h2>Decrypted value is: " + decrypted + "</h2><h2>participantDataAsBytes value: "
                     + participantDataAsBytes +"</h2><h2>encryptionKeyBytes value: "
                     + encryptionKeyBytes + "</h2></body></html>");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        System.out.println("Received POST request");
+        System.out.println("Is there anybody out there? ");
+
+        String data = extractPostRequestBody(request);
+
+        System.out.println("data: " + data);
+
+        JSONObject requestBody = new JSONObject(data);
+
+        String token = requestBody.getString("token");
+        String secret = requestBody.getString("secret");
+        String program = requestBody.getString("programID");
+        String participantData = requestBody.getString("body");
+
+        System.out.println("Got Header data:");
+        System.out.println("token = " + token);
+        System.out.println("program = " + program);
+        System.out.println("secret = " + secret);
+        System.out.println("participantData = " + participantData);
+
+
+        // Since http requests interpret "+" as " ", this has to be fixed prior to decrypting data so it can decrypt data
+        participantData = participantData.replace(" ", "+");
+
+        // Initialize JSON object
+        JSONObject decryptedData;
+
+        // function call returns a JSON object that is assigned to decryptedData.
+        decryptedData = decrypt(token, secret, program, participantData);
+
+        // Creates a new SignatureBuilder object that prepares the data for a POST request
+        SignatureBuilder upsertParticipants = new SignatureBuilder(
+                decryptedData.getString("keyword"),
+                decryptedData.getString("token"),
+                decryptedData.getString("secret"),
+                decryptedData.getString("urlEndPoint"),
+                decryptedData.getString("body"),
+                decryptedData.getString("programID"),
+                participantData);
+
+        // Attempt a POST request
+        try {
+            upsertParticipants.makeRequest();
+        } finally {
+            // Successful request will respond with a page that says successful
+            if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
+                PrintWriter out = response.getWriter();
+                out.print(upsertParticipants.successfulRequest());
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                // Unsuccessful request will respond with a page that says unsuccessful and a bunch of data to
+                // understand what it was doing and what values it was working with
+                String fail = "<html><body><h1 align='center'>Your request was unsuccessful and has no \"body\" data.</h1>"
+                        + "<h2>Token Used: " + decryptedData.getString("token") + "</h2><h2>Secret Used: "
+                        + decryptedData.getString("secret") + "</h2><h2>Keyword Used: " + decryptedData.getString("keyword")
+                        + "</h2><h2>Endpoint Used: " + decryptedData.getString("urlEndPoint")
+                        + "</h2><h2>Timestamp Used: " + "</h2><h2>Body Used: Not Set</h2><h2>Timestamp Used: Not Set"
+                        + "Not Set</h2><h2>Signature Used: Not Set</h2><h2>Encrypted Signature Used: Not Set</h2>"
+                        + "<h2>Authorization Used: Not Set</h2><h2>Response received: Not Set</h2></body></html>";
+
+                PrintWriter out = response.getWriter();
+                out.print(fail);
+            }
         }
     }
 }

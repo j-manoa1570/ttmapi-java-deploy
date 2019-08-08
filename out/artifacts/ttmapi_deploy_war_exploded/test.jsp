@@ -12,7 +12,7 @@
     </head>
     <body>
         <h1>Hello World!</h1>
-        <form action="process.jsp">
+        <form action="/ttmapi_deploy_war_exploded/processUser" method="post">
             <p>
                 Username:
                 <input type="text" name="loginname">

@@ -1,6 +1,4 @@
 import org.json.JSONObject;
-import sun.misc.IOUtils;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -9,7 +7,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -18,8 +15,6 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /*
@@ -158,6 +153,12 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
+    /*
+     *  EXTRACT POST REQUEST BODY
+     *  INPUT: request that was initially given
+     *  DESCRIPTION: Extracts body data from the body parameter that is sent via POST.
+     *  OUTPUT: Returns a string that contains the body
+     */
     private String extractPostRequestBody(HttpServletRequest request) throws IOException {
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             Scanner s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
@@ -256,28 +257,34 @@ public class UpsertParticipants extends HttpServlet {
         }
     }
 
+    /*
+     *  DO POST
+     *  INPUT: request and response parameters inherited from HttpServlet
+     *  DESCRIPTION: Performs the received request. Reads the body that is sent from the POST, converts the body to
+     *  a JSONObject for ease of use, decrypts body and inserts all data into another JSONObject, creates the
+     *  SignatureBuilder object, and makes request.
+     *  OUTPUT: HTML page to display.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("Received POST request");
-        System.out.println("Is there anybody out there? ");
-
+        // A function is called that allows for reading of body data that is
+        // received via POST
         String data = extractPostRequestBody(request);
 
-        System.out.println("data: " + data);
-
+        // I find JSONObject to be an easy format to deal with so I use it to
+        // convert the string into a JSON object for ease of use.
         JSONObject requestBody = new JSONObject(data);
-
         String token = requestBody.getString("token");
         String secret = requestBody.getString("secret");
         String program = requestBody.getString("programID");
         String participantData = requestBody.getString("body");
 
-        System.out.println("Got Header data:");
-        System.out.println("token = " + token);
-        System.out.println("program = " + program);
-        System.out.println("secret = " + secret);
-        System.out.println("participantData = " + participantData);
+//        System.out.println("Got Header data:");
+//        System.out.println("token = " + token);
+//        System.out.println("program = " + program);
+//        System.out.println("secret = " + secret);
+//        System.out.println("participantData = " + participantData);
 
 
         // Since http requests interpret "+" as " ", this has to be fixed prior to decrypting data so it can decrypt data

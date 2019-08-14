@@ -280,12 +280,6 @@ public class UpsertParticipants extends HttpServlet {
         String program = requestBody.getString("programID");
         String participantData = requestBody.getString("body");
 
-//        System.out.println("Got Header data:");
-//        System.out.println("token = " + token);
-//        System.out.println("program = " + program);
-//        System.out.println("secret = " + secret);
-//        System.out.println("participantData = " + participantData);
-
 
         // Since http requests interpret "+" as " ", this has to be fixed prior to decrypting data so it can decrypt data
         participantData = participantData.replace(" ", "+");
@@ -311,10 +305,11 @@ public class UpsertParticipants extends HttpServlet {
             upsertParticipants.makeRequest();
         } finally {
             // Successful request will respond with a page that says successful
-            if (upsertParticipants.getStatus() == 200 || upsertParticipants.getStatus() == 202) {
+            response.setStatus(upsertParticipants.getStatus());
+            if (response.getStatus() == 200 || response.getStatus() == 202) {
+                response.setContentType("text/html");
                 PrintWriter out = response.getWriter();
                 out.print(upsertParticipants.successfulRequest());
-                response.setStatus(HttpServletResponse.SC_OK);
             } else {
                 // Unsuccessful request will respond with a page that says unsuccessful and a bunch of data to
                 // understand what it was doing and what values it was working with
@@ -326,6 +321,7 @@ public class UpsertParticipants extends HttpServlet {
                         + "Not Set</h2><h2>Signature Used: Not Set</h2><h2>Encrypted Signature Used: Not Set</h2>"
                         + "<h2>Authorization Used: Not Set</h2><h2>Response received: Not Set</h2></body></html>";
 
+                response.setContentType("text/html");
                 PrintWriter out = response.getWriter();
                 out.print(fail);
             }

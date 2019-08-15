@@ -5,22 +5,15 @@
   </component>
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="ttmapi-deploy:war" />
+      <artifact name="ttmapi-deploy:war exploded" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a4fa3602-61fa-4d52-b013-43f1d3a3c4eb" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/web/readme.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war/ttmapi-deploy_war.war" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war/ttmapi-deploy_war.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/SignatureBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/SignatureBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/UpsertParticipants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/WEB-INF/classes/UpsertParticipants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ttmapi-deploy/SignatureBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ttmapi-deploy/SignatureBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ttmapi-deploy/UpsertParticipants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ttmapi-deploy/UpsertParticipants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SignatureBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SignatureBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UpsertParticipants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UpsertParticipants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/login/AnotherTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/snippets" beforeDir="false" afterPath="$PROJECT_DIR$/src/snippets" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/ttmapi_deploy_war_exploded/index.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/web/index.jsp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -35,20 +28,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/index.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+            <state relative-caret-position="323">
+              <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/readme.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="546">
+              <caret line="63" column="23" selection-start-line="63" selection-start-column="23" selection-end-line="63" selection-end-column="23" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/snippets">
+        <entry file="file://$PROJECT_DIR$/src/ProgramParticipants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" selection-start-line="16" selection-end-line="16" />
+            <state relative-caret-position="221">
+              <caret line="19" column="52" selection-start-line="19" selection-start-column="52" selection-end-line="19" selection-end-column="52" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -56,7 +61,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/SignatureBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="841">
+            <state relative-caret-position="1274">
               <caret line="400" column="16" selection-start-line="400" selection-start-column="16" selection-end-line="400" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -89,7 +94,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/UpsertParticipants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="806">
+            <state relative-caret-position="537">
               <caret line="323" column="53" selection-start-line="323" selection-start-column="53" selection-end-line="323" selection-end-column="53" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -115,9 +120,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Jsp File" />
         <option value="Class" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -146,7 +151,6 @@
         <option value="$PROJECT_DIR$/src/bulkUpsert.java" />
         <option value="$PROJECT_DIR$/web/admin.jsp" />
         <option value="$PROJECT_DIR$/src/ProgramParticipants.java" />
-        <option value="$PROJECT_DIR$/src/ListPrograms.java" />
         <option value="$PROJECT_DIR$/src/ParticipantMessages.java" />
         <option value="$PROJECT_DIR$/src/ListParticipants.java" />
         <option value="$PROJECT_DIR$/web/account_setup.jsp" />
@@ -163,7 +167,9 @@
         <option value="$PROJECT_DIR$/src/SignatureBuilder.java" />
         <option value="$PROJECT_DIR$/src/UpsertParticipants.java" />
         <option value="$PROJECT_DIR$/src/snippets" />
+        <option value="$PROJECT_DIR$/src/ListPrograms.java" />
         <option value="$PROJECT_DIR$/web/index.jsp" />
+        <option value="$PROJECT_DIR$/web/readme.html" />
       </list>
     </option>
   </component>
@@ -186,7 +192,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -218,7 +224,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -454,17 +460,19 @@
       <workItem from="1565660636110" duration="599000" />
       <workItem from="1565717539316" duration="1210000" />
       <workItem from="1565739648157" duration="599000" />
-      <workItem from="1565809625939" duration="848000" />
+      <workItem from="1565809625939" duration="2518000" />
+      <workItem from="1565901862167" duration="2973000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="173989000" />
+    <option name="totallyTimeSpent" value="178632000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.32249466" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.32622603" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -473,8 +481,8 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info id="Web" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" sideWeight="0.49946696" visible="true" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4904051" weight="0.30119178" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49946696" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4904051" visible="true" weight="0.30119178" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49840087" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -553,26 +561,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ListPrograms.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="78">
-          <caret line="23" column="52" selection-start-line="23" selection-start-column="52" selection-end-line="23" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProgramParticipants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-66">
-          <caret line="19" column="52" selection-start-line="19" selection-start-column="52" selection-end-line="19" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ConnectionProvider.java" />
     <entry file="file://$PROJECT_DIR$/src/Register.java" />
     <entry file="file://$PROJECT_DIR$/src/User.java" />
@@ -599,9 +587,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/login/AnotherTest.java" />
+    <entry file="file://$PROJECT_DIR$/src/Test.java" />
+    <entry file="file://$PROJECT_DIR$/src/snippets">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ListPrograms.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="46" column="5" lean-forward="true" selection-start-line="46" selection-start-column="5" selection-end-line="46" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/UpsertParticipants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="806">
+        <state relative-caret-position="537">
           <caret line="323" column="53" selection-start-line="323" selection-start-column="53" selection-end-line="323" selection-end-column="53" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -621,26 +628,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/login/AnotherTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="18" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Test.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="80" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="80" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/SignatureBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="841">
+        <state relative-caret-position="1274">
           <caret line="400" column="16" selection-start-line="400" selection-start-column="16" selection-end-line="400" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -669,17 +659,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/snippets">
+    <entry file="file://$PROJECT_DIR$/web/index.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        <state relative-caret-position="323">
+          <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/web/index.jsp">
+    <entry file="file://$PROJECT_DIR$/src/ProgramParticipants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+        <state relative-caret-position="221">
+          <caret line="19" column="52" selection-start-line="19" selection-start-column="52" selection-end-line="19" selection-end-column="52" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/readme.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="63" column="23" selection-start-line="63" selection-start-column="23" selection-end-line="63" selection-end-column="23" />
         </state>
       </provider>
     </entry>

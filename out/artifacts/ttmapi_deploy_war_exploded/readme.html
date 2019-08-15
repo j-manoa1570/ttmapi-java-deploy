@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Connect API ReadMe</title>
+</head>
+<body>
+
+    <h1>Connect API ReadMe</h1><hr>
+    <div>
+        <h2>1.0 Introductory Notes</h2>
+        <p>1.1 Each endpoint when connecting to this API will require 3 parameters (4 in the case of upserts); "token",
+            "secret", and one of 3 different IDs. The parameters can either be passed through the url as a GET request or
+            in the body as a POST request. The general flow of how the API works is as follows:</p>
+        <p>Step 1: Takes the 3(4 for upsert) parameters and add 1 more. The additional parameter is the keyword, either GET
+            or POST. Additionally, the ID parameter is immediately formatted into the url endpoint.</p>
+        <p>Step 2: Once these 4 or 5 pieces of data have been gathered, a timestamp will be generated.</p>
+        <p>Step 2.5: For upserts, the JSON string has all key values stripped off and placed as the first line of the csv
+            string to be generated. All values that are associated with the keys are stripped off and placed into its
+            own string. For upserting multiple records, this is also taken into account and each additional record,
+            instead of processing keys and values, only values are taken from additional records. Once all JSON records
+            have been processed, the string encoded csv is built.</p>
+        <p>Step 3: At this point, all data needed to build the signature has been received/created and is now encrypted using
+            SHA-256 with the secret that the user provided as the passphrase for encryption.</p>
+        <p>Step 4: The request headers are built using "Authorization : =token=:=encrypted signature=" and "SignalVine-Date : =timestamp="
+            where the timestamp is the one generated in step 2. The corresponding request is then made sending the
+            headers(and body if needed) as required by Signal Vine.</p>
+        <p>Step 5: Once the responds body and code are returned, they are returned to the end user as html code displaying
+            the result. If the result is success, the html will state success and any returned data and if it is unsuccessful,
+            it will state unsuccessful, the code returned, and the data that it was given.</p>
+    </div><hr>
+    <div>
+        <h2>1.0 API Connections/Functions</h2>
+        <h3>1.1 List Programs</h3>
+        <p>1.1.1 This can be called at "/listPrograms". Requires the following parameters:</p>
+        <p>"token"</p>
+        <p>"secret"</p>
+        <p>"accountID"</p>
+        <br>
+        <h3>1.2 Program Participants</h3>
+        <p>1.2.1 This can be called at "/programParticipants". Requires the following parameters:</p>
+        <p>"token"</p>
+        <p>"secret"</p>
+        <p>"programID"</p>
+        <br>
+        <h3>1.3 Upsert Participants</h3>
+        <p>1.3.1 This can be called at "/upsertParticipants". Requires the following parameters:</p>
+        <p>"token"</p>
+        <p>"secret"</p>
+        <p>"programID"</p>
+        <p>"body"</p>
+        <p>NOTE: The body should be encoded as AES with the following passphrase: </p>
+        <br>
+        <h3>1.4 List Participants</h3>
+        <p>1.4.1 This can be called at "/listParticipants". Requires the following parameters:</p>
+        <p>"token"</p>
+        <p>"secret"</p>
+        <p>"accountID"</p>
+        <br>
+        <h3>1.5 Participant Messages</h3>
+        <p>1.5.1 This can be called at "/participantMessages". Requires the following parameters:</p>
+        <p>"token"</p>
+        <p>"secret"</p>
+        <p>"participantID"</p>
+        <br>
+        <hr>
+    </div><hr>
+</body>
+</html>
